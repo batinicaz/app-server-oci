@@ -1,0 +1,27 @@
+- name: Remove common log files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /var/log/syslog
+    - /var/log/auth.log
+    - /var/log/dpkg.log
+
+- name: Remove host keys
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/ssh/ssh_host_rsa_key
+    - /etc/ssh/ssh_host_dsa_key
+    - /etc/ssh/ssh_host_ecdsa_key
+    - /etc/ssh/ssh_host_ed25519_key
+
+- name: Remove SSH
+  ansible.builtin.apt:
+    name: openssh-server
+    state: absent
+
+- name: Clear apt repo cache
+  ansible.builtin.apt:
+    autoclean: true

@@ -1,0 +1,6 @@
+- name: Build Fress RSS OCI Image
+  hosts: default
+  become: true
+  roles:
+    - setup
+    - cleanup

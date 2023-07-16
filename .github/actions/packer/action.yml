@@ -49,18 +49,28 @@ runs:
         echo DELETE_FLAG=${deleteFlag} >> $GITHUB_ENV
       shell: bash
 
+    - name: Set hcpBucketName flag
+      run: |
+        hcpBucketName='gha-branch-build'
+        if [[ "${{ github.ref_name }}" == "main" ]]; then
+          hcpBucketName='stable'
+        fi
+        echo BUCKET_NAME=${hcpBucketName} >> $GITHUB_ENV
+      shell: bash
+
     - name: Build
-      uses: docker://ghcr.io/batinicaz/packer:latest
-      with:
-        args: |
-          test -v ./packer/tests ${{ env.DELETE_FLAG }} \
-          -fingerprint "${{ inputs.fingerprint }}" \
-          -hcpClientID "${{ inputs.hcpClientID }}" \
-          -hcpClientSecret "${{ inputs.hcpClientSecret }}" \
-          -privateKey "${{ inputs.privateKey }}" \
-          -region "${{ inputs.region }}" \
-          -subnetOCID "${{ inputs.subnetOCID }}" \
-          -rootTenancyOCID "${{ inputs.rootTenancyOCID }}" \
-          -terraformTenancyOCID "${{ inputs.terraformTenancyOCID }}" \
-          -userOCID "${{ inputs.userOCID }}" \
-          -version "${{ github.ref }}"
+      run: >
+        docker run --rm -v "$(pwd):/work" -w /work
+        ghcr.io/batinicaz/packer:latest go test -v ./packer/tests ${{ env.DELETE_FLAG }}
+        -hcpBucketName ${{ env.BUCKET_NAME }}
+        -fingerprint "${{ inputs.fingerprint }}"
+        -hcpClientID "${{ inputs.hcpClientID }}"
+        -hcpClientSecret "${{ inputs.hcpClientSecret }}"
+        -privateKey "${{ inputs.privateKey }}"
+        -region "${{ inputs.region }}"
+        -subnetOCID "${{ inputs.subnetOCID }}"
+        -rootTenancyOCID "${{ inputs.rootTenancyOCID }}"
+        -terraformTenancyOCID "${{ inputs.terraformTenancyOCID }}"
+        -userOCID "${{ inputs.userOCID }}"
+        -version "${{ github.ref }}"
+      shell: bash

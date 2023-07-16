@@ -22,7 +22,7 @@ jobs:
           fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
           hcpClientID: "${{ secrets.HCP_CLIENT_ID }}"
           hcpClientSecret: "${{ secrets.HCP_CLIENT_SECRET }}"
-          keepImage: trueg
+          keepImage: true
           privateKey: "${{ secrets.OCI_PRIVATE_KEY }}"
           region: "${{ vars.OCI_REGION }}"
           subnetOCID: "${{ secrets.SUBNET_OCID }}"
