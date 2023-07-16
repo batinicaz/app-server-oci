@@ -1,0 +1,66 @@
+name: Packer
+description: Builds and tests packer image using Terratest
+author: batinicaz
+
+inputs:
+  fingerprint:
+    description: OCI fingerpint
+    required: true
+  hcpClientID:
+    description: HCP client ID
+    required: true
+  hcpClientSecret:
+    description: HCP client secret
+    required: true
+  keepImage:
+    description: Keep the image available if tests pass?
+    default: 'false'
+    required: false
+  privateKey:
+    description: OCI private key
+    required: true
+  region:
+    description: OCI region
+    required: true
+  subnetOCID:
+    description: OCI subnet
+    required: true
+  rootTenancyOCID:
+    description: OCI root tenancy
+    required: true
+  terraformTenancyOCID:
+    description: OCI terraform tenancy
+    required: true
+  userOCID:
+    description: OCI user
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
+
+    - name: Set delete flag
+      run: |
+        deleteFlag=''
+        if [[ "${{ inputs.keepImage }}" != "true" ]]; then
+          deleteFlag='-deleteImage'
+        fi
+        echo DELETE_FLAG=${deleteFlag} >> $GITHUB_ENV
+      shell: bash
+
+    - name: Build
+      uses: docker://ghcr.io/batinicaz/packer:latest
+      with:
+        args: |
+          test -v ./packer/tests ${{ env.DELETE_FLAG }} \
+          -fingerprint "${{ inputs.fingerprint }}" \
+          -hcpClientID "${{ inputs.hcpClientID }}" \
+          -hcpClientSecret "${{ inputs.hcpClientSecret }}" \
+          -privateKey "${{ inputs.privateKey }}" \
+          -region "${{ inputs.region }}" \
+          -subnetOCID "${{ inputs.subnetOCID }}" \
+          -rootTenancyOCID "${{ inputs.rootTenancyOCID }}" \
+          -terraformTenancyOCID "${{ inputs.terraformTenancyOCID }}" \
+          -userOCID "${{ inputs.userOCID }}" \
+          -version "${{ github.ref }}"
