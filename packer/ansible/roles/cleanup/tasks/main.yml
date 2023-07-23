@@ -18,12 +18,7 @@
     - /etc/ssh/ssh_host_ed25519_key
   when: local_dev is not defined
 
-- name: Remove SSH
-  ansible.builtin.apt:
-    name: openssh-server
-    state: absent
-  when: local_dev is not defined
-
 - name: Clear apt repo cache
   ansible.builtin.apt:
     autoclean: true
+    autoremove: true

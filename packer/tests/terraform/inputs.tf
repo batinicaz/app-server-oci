@@ -9,20 +9,15 @@ variable "image_id" {
   type        = string
 }
 
+variable "ingress_ports" {
+  description = "Ports to open"
+  type        = set(string)
+}
+
 variable "instance_shape" {
   type        = string
   default     = "VM.Standard.E2.1.Micro"
   description = "Instance type to use, default is the always free domain x86 option."
-}
-
-variable "subnet_ocid" {
-  description = "The OCID of the subnet to use for the build instance"
-  type        = string
-}
-
-variable "terraform_tenancy_ocid" {
-  description = "The tenancy id where to resources are to be created"
-  type        = string
 }
 
 variable "oci_fingerprint" {
@@ -48,4 +43,22 @@ variable "oci_tenancy_id" {
 variable "oci_user_id" {
   description = "The ID of user that terraform will use to create the resources"
   type        = string
+}
+
+variable "subnet_ocid" {
+  description = "The OCID of the subnet to use for the build instance"
+  type        = string
+}
+
+variable "terraform_tenancy_ocid" {
+  description = "The tenancy id where to resources are to be created"
+  type        = string
+}
+
+locals {
+  defined_tags = {
+    "terraform.managed" = "packer"
+    "terraform.name"    = "Fresh RSS Build"
+    "terraform.repo"    = "https://github.com/batinicaz/freshrss-oci"
+  }
 }

@@ -1,4 +1,28 @@
 - name: Update all packages
   ansible.builtin.apt:
-    upgrade: dist
+    name: "*"
+    state: latest
     update_cache: true
+
+- name: Install pip
+  ansible.builtin.apt:
+    name: python3-pip
+    state: present
+
+- name: Install oci-cli
+  ansible.builtin.pip:
+    name: oci-cli
+    state: present
+
+- name: Support persisting iptable rules
+  ansible.builtin.apt:
+    name: iptables-persistent
+    state: present
+
+- name: Put default iptable rules in place
+  ansible.builtin.copy:
+    src: default.rules
+    dest: /etc/iptables/rules.v4
+    owner: "root"
+    group: "root"
+    mode: "0600"

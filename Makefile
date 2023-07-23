@@ -25,7 +25,8 @@ run-playbook:
     --extra-vars "local_dev=true" \
     --private-key $(KEY_FILE) \
     --user ubuntu \
-    $(ANSIBLE_DIR)/playbook.yml
+    --vault-password-file .vault-password \
+    $(ANSIBLE_DIR)/playbook.yml || [ -n "$(SKIP_CLEAN)" ] || make clean
 
 clean:
 	multipass delete --purge $(VM_NAME)

@@ -3,6 +3,10 @@ terraform {
     path = "terratest-run.tfstate"
   }
   required_providers {
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.0"
+    }
     oci = {
       source  = "oracle/oci"
       version = "~> 5.0"

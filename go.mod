@@ -3,9 +3,9 @@ module batinicaz/freshrss-oci
 go 1.20
 
 require (
-	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gruntwork-io/terratest v0.43.8
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090
 )
 
 require (
@@ -40,7 +40,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/oracle/oci-go-sdk v7.1.0+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tmccombs/hcl2json v0.3.3 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
