@@ -3,6 +3,9 @@ description: Builds and tests packer image using Terratest
 author: batinicaz
 
 inputs:
+  ansibleVaultPass:
+    description: The password to access the encrypted ansible vault
+    required: true
   fingerprint:
     description: OCI fingerpint
     required: true
@@ -40,6 +43,15 @@ runs:
   steps:
     - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
 
+    - name: Decrypt ansible vault
+      run: >
+        docker run --rm -v "$(pwd):/work" -w /work
+        ghcr.io/batinicaz/packer:latest
+        echo ${{ inputs.ansibleVaultPass }} > vault-pass &&
+        ansible-vault decrypt --vault-password-file vault-pass packer/ansible/vault.yml;
+        rm vault-pass
+      shell: bash
+
     - name: Set delete flag
       run: |
         deleteFlag=''
@@ -61,7 +73,8 @@ runs:
     - name: Build
       run: >
         docker run --rm -v "$(pwd):/work" -w /work
-        ghcr.io/batinicaz/packer:latest go test -v ./packer/tests ${{ env.DELETE_FLAG }}
+        ghcr.io/batinicaz/packer:latest echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
+        go test -timeout 1h -v ./packer/tests ${{ env.DELETE_FLAG }}
         -hcpBucketName ${{ env.BUCKET_NAME }}
         -fingerprint "${{ inputs.fingerprint }}"
         -hcpClientID "${{ inputs.hcpClientID }}"
@@ -72,5 +85,16 @@ runs:
         -rootTenancyOCID "${{ inputs.rootTenancyOCID }}"
         -terraformTenancyOCID "${{ inputs.terraformTenancyOCID }}"
         -userOCID "${{ inputs.userOCID }}"
-        -version "${{ github.ref }}"
+        -version "${{ github.ref }}";
+        rm packer/tests/.vault-password
+      shell: bash
+
+    - name: Seal ansible vault
+      if: always()
+      run: >
+        docker run --rm -v "$(pwd):/work" -w /work
+        ghcr.io/batinicaz/packer:latest
+        echo ${{ inputs.ansibleVaultPass }} > vault-pass &&
+        ansible-vault encrypt --vault-password-file vault-pass packer/ansible/vault.yml;
+        rm vault-pass
       shell: bash

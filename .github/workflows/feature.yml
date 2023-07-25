@@ -15,8 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
 
+      - name: Decrypt ansible vault
+        run: >
+          docker run --rm -v "$(pwd):/home/nonroot/work" -w /home/nonroot/work --entrypoint bash
+          ghcr.io/batinicaz/pre-commit:latest
+          -c 'echo ${{ secrets.VAULT_PASS }} > vault-pass &&
+          ansible-vault decrypt --vault-password-file vault-pass packer/ansible/vault.yml &&
+          ansible-galaxy install -r packer/ansible/requirements.yml &&
+          git config --global --add safe.directory /home/nonroot/work &&
+          pre-commit run -a;
+          rm vault-pass'
+
       - name: Run pre-commit
         uses: batinicaz/gha/.github/actions/pre-commit@f95e2fd11d902f8e6b6eac6ff85ced89eb6d6fc2 # ratchet:batinicaz/gha/.github/actions/pre-commit@latest
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -24,6 +36,7 @@ jobs:
 
       - uses: ./.github/actions/packer
         with:
+          ansibleVaultPass: "${{ secrets.VAULT_PASS }}"
           fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
           hcpClientID: "${{ secrets.HCP_CLIENT_ID }}"
           hcpClientSecret: "${{ secrets.HCP_CLIENT_SECRET }}"

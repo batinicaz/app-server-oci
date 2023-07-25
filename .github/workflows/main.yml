@@ -19,6 +19,7 @@ jobs:
 
       - uses: ./.github/actions/packer
         with:
+          ansibleVaultPass: "${{ secrets.VAULT_PASS }}"
           fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
           hcpClientID: "${{ secrets.HCP_CLIENT_ID }}"
           hcpClientSecret: "${{ secrets.HCP_CLIENT_SECRET }}"
