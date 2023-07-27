@@ -60,3 +60,4 @@ terraform.rc
 
 .idea/
 .vault-password
+gha.secrets

@@ -28,5 +28,9 @@ run-playbook:
     --vault-password-file .vault-password \
     $(ANSIBLE_DIR)/playbook.yml || [ -n "$(SKIP_CLEAN)" ] || make clean
 
+gha:
+	act --container-architecture linux/amd64 --var-file gha.env --secret-file gha.secrets --secret GITHUB_TOKEN=$(shell gh auth token)
+	find . -type f -iname *.lock* -delete
+
 clean:
 	multipass delete --purge $(VM_NAME)
