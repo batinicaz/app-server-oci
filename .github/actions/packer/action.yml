@@ -46,10 +46,10 @@ runs:
     - name: Decrypt ansible vault
       run: >
         docker run --rm -v "$(pwd):/work" -w /work
-        ghcr.io/batinicaz/packer:latest
-        echo ${{ inputs.ansibleVaultPass }} > vault-pass &&
+        ghcr.io/batinicaz/packer:latest sh -c
+        'echo ${{ inputs.ansibleVaultPass }} > vault-pass &&
         ansible-vault decrypt --vault-password-file vault-pass packer/ansible/vault.yml;
-        rm vault-pass
+        rm vault-pass'
       shell: bash
 
     - name: Set delete flag
@@ -73,7 +73,8 @@ runs:
     - name: Build
       run: >
         docker run --rm -v "$(pwd):/work" -w /work
-        ghcr.io/batinicaz/packer:latest echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
+        ghcr.io/batinicaz/packer:latest sh -c
+        'echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
         go test -timeout 1h -v ./packer/tests ${{ env.DELETE_FLAG }}
         -hcpBucketName ${{ env.BUCKET_NAME }}
         -fingerprint "${{ inputs.fingerprint }}"
@@ -86,15 +87,7 @@ runs:
         -terraformTenancyOCID "${{ inputs.terraformTenancyOCID }}"
         -userOCID "${{ inputs.userOCID }}"
         -version "${{ github.ref }}";
-        rm packer/tests/.vault-password
-      shell: bash
-
-    - name: Seal ansible vault
-      if: always()
-      run: >
-        docker run --rm -v "$(pwd):/work" -w /work
-        ghcr.io/batinicaz/packer:latest
-        echo ${{ inputs.ansibleVaultPass }} > vault-pass &&
-        ansible-vault encrypt --vault-password-file vault-pass packer/ansible/vault.yml;
-        rm vault-pass
+        rm packer/tests/.vault-password &&
+        git config --global --add safe.directory /work &&
+        git checkout packer/ansible/vault.yml'
       shell: bash
