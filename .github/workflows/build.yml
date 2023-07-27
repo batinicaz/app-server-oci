@@ -51,3 +51,22 @@ jobs:
           rootTenancyOCID: "${{ secrets.ROOT_TENANCY_OCID }}"
           terraformTenancyOCID: "${{ secrets.TERRAFORM_TENANCY_OCID }}"
           userOCID: "${{ secrets.OCI_USER_OCID }}"
+
+  Cleanup:
+    needs: Build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: clean
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
+
+      - name: Run cleanup action
+        uses: ./.github/actions/cleanup
+        with:
+          compartmentId: "${{ secrets.TERRAFORM_TENANCY_OCID }}"
+          fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
+          privateKey: "${{ secrets.OCI_PRIVATE_KEY }}"
+          region: "${{ vars.OCI_REGION }}"
+          tenancy: "${{ secrets.ROOT_TENANCY_OCID }}"
+          user: "${{ secrets.OCI_USER_OCID }}"

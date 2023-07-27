@@ -1,0 +1,111 @@
+name: Cleanup
+description: Removes all but the N most reent images
+author: batinicaz
+
+inputs:
+  compartmentId:
+    description: 'OCI Compartment ID'
+    required: true
+  dryRun:
+    description: 'Dry run (set to "true" to not delete images)'
+    required: false
+    default: 'true'
+  fingerprint:
+    description: 'OCI User Fingerprint'
+    required: true
+  imageName:
+    description: 'Name of the images to manage'
+    required: false
+    default: 'freshrss-'
+  ociCliVersion:
+    description: 'Version of OCI CLI to install'
+    required: false
+    default: '3.30.0'
+  privateKey:
+    description: 'Base64 encoded OCI Private Key'
+    required: true
+  region:
+    description: 'OCI Region'
+    required: true
+  retainCount:
+    description: 'Number of most recent images to retain'
+    required: false
+    default: '1' # free tier limit is 10GB of storage, 1 image is ~6GB
+  tenancy:
+    description: 'OCI Tenancy'
+    required: true
+  user:
+    description: 'OCI User'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install OCI CLI
+      run: |
+        if [ "${{ inputs.ociCliVersion }}" == "latest" ]; then
+            curl -fLO 'https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh'
+        else
+            curl -fLO 'https://raw.githubusercontent.com/oracle/oci-cli/v${{ inputs.ociCliVersion }}/scripts/install/install.sh'
+        fi
+        bash install.sh --accept-all-defaults
+        echo "$HOME/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Setup OCI CLI
+      run: |
+        mkdir -p "${HOME}/.oci"
+        cat <<EOF >$HOME/.oci/config
+        [DEFAULT]
+        user=${{ inputs.user }}
+        fingerprint=${{ inputs.fingerprint }}
+        tenancy=${{ inputs.tenancy }}
+        region=${{ inputs.region }}
+        key_file=$HOME/.oci/oci_api_key.pem
+        EOF
+        echo "${{ inputs.privateKey }}" | base64 --decode > $HOME/.oci/oci_api_key.pem
+        oci setup repair-file-permissions --file $HOME/.oci/config
+        oci setup repair-file-permissions --file $HOME/.oci/oci_api_key.pem
+      shell: bash
+
+    - name: Clean up OCI images
+      run: |
+        ALL_IMAGES=$(oci compute image list --compartment-id ${{ inputs.compartmentId }} --all)
+
+        FILTERED_IMAGES=$(echo "$ALL_IMAGES" | \
+          jq -c '.data[] | select(.["display-name"] | contains("'"${{ inputs.imageName }}"'"))')
+
+        if [ -z "$FILTERED_IMAGES" ] || [ "$FILTERED_IMAGES" == "[]" ]; then
+            echo "No images found."
+        else
+            if [ "${{ inputs.retainCount }}" == "0" ]; then
+                IMAGES_TO_DELETE=$(echo "[$FILTERED_IMAGES]")
+            else
+                IMAGES_TO_DELETE=$(echo "$FILTERED_IMAGES" | \
+                  jq -c -s 'if length > '"${{ inputs.retainCount }}"' then
+                               sort_by(.["time-created"])[:-'"${{ inputs.retainCount }}"']
+                             else
+                               empty
+                             end' | jq 'if type=="object" then [.] else . end')
+            fi
+
+            if [ -z "$IMAGES_TO_DELETE" ] || [ "$IMAGES_TO_DELETE" == "[]" ]; then
+                echo "No images to delete."
+            else
+                if [ "${{ inputs.dryRun }}" == "true" ]; then
+                    echo "Dry run enabled. These images would be deleted:"
+                    if [ "$(echo "$IMAGES_TO_DELETE" | jq -r 'if type=="array" then .[] else . end | .["display-name"]')" != "null" ]; then
+                        for IMAGE_NAME in $(echo "$IMAGES_TO_DELETE" | jq -r 'if type=="array" then .[] else . end | .["display-name"]'); do
+                            echo "Image: ${IMAGE_NAME}"
+                        done
+                    fi
+                else
+                    if [ "$(echo "$IMAGES_TO_DELETE" | jq -r 'if type=="array" then .[] else . end | .id')" != "null" ]; then
+                        for IMAGE_ID in $(echo "$IMAGES_TO_DELETE" | jq -r 'if type=="array" then .[] else . end | .id'); do
+                            oci compute image delete --image-id ${IMAGE_ID} --force
+                        done
+                    fi
+                fi
+            fi
+        fi
+      shell: bash
