@@ -70,6 +70,10 @@ runs:
         echo BUCKET_NAME=${hcpBucketName} >> $GITHUB_ENV
       shell: bash
 
+    - name: Set version flag
+      run: echo "VERSION=${{ github.ref_name }}-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
+      shell: bash
+
     - name: Build
       run: >
         docker run --rm -v "$(pwd):/work" -w /work
@@ -86,7 +90,7 @@ runs:
         -rootTenancyOCID "${{ inputs.rootTenancyOCID }}"
         -terraformTenancyOCID "${{ inputs.terraformTenancyOCID }}"
         -userOCID "${{ inputs.userOCID }}"
-        -version "${{ github.ref }}";
+        -version "${{ env.VERSION }}";
         rm packer/tests/.vault-password &&
         git config --global --add safe.directory /work &&
         git checkout packer/ansible/vault.yml'
