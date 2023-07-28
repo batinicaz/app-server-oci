@@ -20,13 +20,15 @@ jobs:
 
       - name: Run pre-commit
         run: >
+          sudo chown -R 65532 "${{ github.workspace }}";
           docker run --rm -v "$(pwd):/home/nonroot/work" -w /home/nonroot/work --entrypoint bash
           ghcr.io/batinicaz/pre-commit:latest
           -c 'echo ${{ secrets.VAULT_PASS }} > vault-pass &&
           ansible-vault decrypt --vault-password-file vault-pass packer/ansible/vault.yml &&
           ansible-galaxy install -r packer/ansible/requirements.yml &&
           git config --global --add safe.directory /home/nonroot/work &&
-          pre-commit run -a; git checkout packer/ansible/vault.yml && rm vault-pass'
+          pre-commit run -a; git checkout packer/ansible/vault.yml && rm vault-pass';
+          sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}"
 
   Build:
     needs: pre-commit
