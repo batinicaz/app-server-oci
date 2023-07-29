@@ -109,9 +109,14 @@ build {
   sources = ["source.oracle-oci.ubuntu"]
 
   provisioner "ansible" {
+    galaxy_file   = "../ansible/requirements.yml"
     playbook_file = "../ansible/playbook.yml"
     user          = var.source_image_username
     use_sftp      = true
+
+    extra_arguments = [
+      "--vault-password-file=.vault-password"
+    ]
   }
 
   hcp_packer_registry {

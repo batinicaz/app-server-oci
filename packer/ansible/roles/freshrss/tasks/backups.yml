@@ -1,0 +1,42 @@
+- name: Create backup directory
+  ansible.builtin.file:
+    path: "{{ backup_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Setup user backup job (every day at 12:55 AM)
+  ansible.builtin.cron:
+    name: "Create backup"
+    weekday: "*"
+    hour: "0"
+    minute: "55"
+    user: root
+    job: "tar -zcvf {{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').tar.gz -C {{ install_dir }} data/users"
+
+- name: Setup DB backup cronjob (every day at 1AM)
+  ansible.builtin.cron:
+    name: MySQL Backup
+    weekday: "*"
+    hour: "1"
+    minute: "0"
+    user: root
+    job: "mysqldump --skip-comments --user=root --password='{{ mysql_root_pass }}' --all-databases > \"{{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').sql\""
+
+- name: Setup cleanup job (every day at 1:30 AM)
+  ansible.builtin.cron:
+    name: Cleanup backups
+    job: find /backups -type f -name '*.sql' -mtime +7 -delete && find /backups -type f -name '*.tar.gz' -mtime +3 -delete
+    weekday: "*"
+    hour: 1
+    minute: 30
+    user: root
+
+- name: Create restore tool
+  ansible.builtin.template:
+    src: restore.sh.j2
+    dest: /bin/freshrss_restore
+    owner: root
+    group: root
+    mode: "0701"

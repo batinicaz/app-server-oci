@@ -1,0 +1,8 @@
+#!/bin/bash
+# Credit - https://github.com/ironicbadger/infra/blob/master/git-init.sh
+if ( git show :packer/ansible/vault.yml | grep -q "\$ANSIBLE_VAULT;" ); then
+    echo "$(tput setaf 2)Vault Encrypted. Safe to commit.$(tput sgr0)"
+else
+    echo "$(tput setaf 1)Vault not encrypted! Run 'ansible-vault encrypt --vault-password-file .vault-password packer/ansible/vault.yml' and try again.$(tput sgr0)"
+exit 1
+fi

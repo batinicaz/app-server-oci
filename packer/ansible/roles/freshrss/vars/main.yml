@@ -1,0 +1,9 @@
+backup_dir: "/backups"
+install_dir: /opt/freshrss
+extensions:
+  - name: ReadingTime
+    source: https://github.com/FreshRSS/Extensions.git
+    directory: xExtension-ReadingTime
+  - name: RedditSub
+    source: https://github.com/balthisar/xExtension-RedditSub/archive/refs/heads/master.zip
+    format: .zip

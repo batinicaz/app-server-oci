@@ -1,6 +1,23 @@
 - name: Build Fress RSS OCI Image
-  hosts: default
+  hosts: all
   become: true
+  vars_files:
+    - vault.yml
   roles:
-    - setup
-    - cleanup
+    - role: setup
+    - role: geerlingguy.mysql
+      src: https://github.com/geerlingguy/ansible-role-mysql/archive/master.tar.gz
+      vars:
+        mysql_databases:
+          - name: freshrss
+            encoding: utf8
+            collation: utf8_general_ci
+        mysql_root_password: "{{ mysql_root_pass }}"
+        mysql_users:
+          - name: freshrss
+            password: "{{ mysql_freshrss_pass }}"
+            priv: '*.*:ALL,GRANT'
+            host: localhost
+    - role: nginx
+    - role: freshrss
+    - role: cleanup

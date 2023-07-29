@@ -97,19 +97,19 @@ func TestAndBuildImage(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		if t.Failed() || deleteImage {
+		if !deleteImage {
+			t.Logf("Image %s retained", imageID)
+		} else {
 			// TODO: Implement natively once OCI better supported in terratest
 			cmd := exec.Command("oci", "compute", "image", "delete", "--force", "--image-id", imageID)
 			_, err := cmd.Output()
-			require.NoError(t, err, "Failed to delete oci iamge")
+			require.NoError(t, err, "Failed to delete oci image")
 			t.Logf("Deleted image %s", imageID)
-		} else {
-			t.Logf("Image %s retained", imageID)
 		}
 	})
 
 	t.Logf("Packer finished building: %s", imageID)
-	// runTerraform(t, imageID, *providerConf)
+	runTerraform(t, imageID, *providerConf)
 
 	t.Logf("Deployment testing complete")
 }

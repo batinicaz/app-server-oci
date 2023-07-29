@@ -1,0 +1,74 @@
+name: Unified Build Workflow
+run-name: "${{ github.ref == 'refs/heads/main' && 'Build and Keep' || format('Build {0}', github.ref_name) }}"
+
+on:
+  push:
+    branches:
+      - "**"
+  schedule:
+    - cron: 0 2 * * *
+
+permissions:
+  contents: read
+
+jobs:
+  pre-commit:
+    if: github.ref != 'refs/heads/main' && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
+
+      - name: Run pre-commit
+        run: >
+          sudo chown -R 65532 "${{ github.workspace }}";
+          docker run --rm -v "$(pwd):/home/nonroot/work" -w /home/nonroot/work --entrypoint bash
+          ghcr.io/batinicaz/pre-commit:latest
+          -c 'echo ${{ secrets.VAULT_PASS }} > vault-pass &&
+          ansible-vault decrypt --vault-password-file vault-pass packer/ansible/vault.yml &&
+          ansible-galaxy install -r packer/ansible/requirements.yml &&
+          git config --global --add safe.directory /home/nonroot/work &&
+          pre-commit run -a; git checkout packer/ansible/vault.yml && rm vault-pass';
+          sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}"
+
+  Build:
+    needs: pre-commit
+    if: github.ref == 'refs/heads/main' || (github.ref != 'refs/heads/main' && github.event_name == 'push')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
+
+      - uses: ./.github/actions/packer
+        with:
+          ansibleVaultPass: "${{ secrets.VAULT_PASS }}"
+          fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
+          hcpClientID: "${{ secrets.HCP_CLIENT_ID }}"
+          hcpClientSecret: "${{ secrets.HCP_CLIENT_SECRET }}"
+          keepImage: "${{ github.ref == 'refs/heads/main' }}"
+          privateKey: "${{ secrets.OCI_PRIVATE_KEY }}"
+          region: "${{ vars.OCI_REGION }}"
+          subnetOCID: "${{ secrets.SUBNET_OCID }}"
+          rootTenancyOCID: "${{ secrets.ROOT_TENANCY_OCID }}"
+          terraformTenancyOCID: "${{ secrets.TERRAFORM_TENANCY_OCID }}"
+          userOCID: "${{ secrets.OCI_USER_OCID }}"
+
+  Cleanup:
+    needs: Build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: clean
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
+
+      - name: Run cleanup action
+        uses: ./.github/actions/cleanup
+        with:
+          compartmentId: "${{ secrets.TERRAFORM_TENANCY_OCID }}"
+          fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
+          privateKey: "${{ secrets.OCI_PRIVATE_KEY }}"
+          region: "${{ vars.OCI_REGION }}"
+          tenancy: "${{ secrets.ROOT_TENANCY_OCID }}"
+          user: "${{ secrets.OCI_USER_OCID }}"

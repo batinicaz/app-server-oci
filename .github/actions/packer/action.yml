@@ -3,6 +3,9 @@ description: Builds and tests packer image using Terratest
 author: batinicaz
 
 inputs:
+  ansibleVaultPass:
+    description: The password to access the encrypted ansible vault
+    required: true
   fingerprint:
     description: OCI fingerpint
     required: true
@@ -40,6 +43,15 @@ runs:
   steps:
     - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
 
+    - name: Decrypt ansible vault
+      run: >
+        docker run --rm -v "$(pwd):/work" -w /work
+        ghcr.io/batinicaz/packer:latest sh -c
+        'echo ${{ inputs.ansibleVaultPass }} > vault-pass &&
+        ansible-vault decrypt --vault-password-file vault-pass packer/ansible/vault.yml;
+        rm vault-pass'
+      shell: bash
+
     - name: Set delete flag
       run: |
         deleteFlag=''
@@ -58,10 +70,16 @@ runs:
         echo BUCKET_NAME=${hcpBucketName} >> $GITHUB_ENV
       shell: bash
 
+    - name: Set version flag
+      run: echo "VERSION=${{ github.ref_name }}-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
+      shell: bash
+
     - name: Build
       run: >
         docker run --rm -v "$(pwd):/work" -w /work
-        ghcr.io/batinicaz/packer:latest go test -v ./packer/tests ${{ env.DELETE_FLAG }}
+        ghcr.io/batinicaz/packer:latest sh -c
+        'echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
+        go test -timeout 1h -v ./packer/tests ${{ env.DELETE_FLAG }}
         -hcpBucketName ${{ env.BUCKET_NAME }}
         -fingerprint "${{ inputs.fingerprint }}"
         -hcpClientID "${{ inputs.hcpClientID }}"
@@ -72,5 +90,8 @@ runs:
         -rootTenancyOCID "${{ inputs.rootTenancyOCID }}"
         -terraformTenancyOCID "${{ inputs.terraformTenancyOCID }}"
         -userOCID "${{ inputs.userOCID }}"
-        -version "${{ github.ref }}"
+        -version "${{ env.VERSION }}";
+        rm packer/tests/.vault-password &&
+        git config --global --add safe.directory /work &&
+        git checkout packer/ansible/vault.yml'
       shell: bash

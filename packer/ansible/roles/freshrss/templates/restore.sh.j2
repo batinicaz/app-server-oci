@@ -1,0 +1,245 @@
+#!/bin/bash
+
+backup_dir="{{ backup_dir }}"
+mysql_user="root"
+mysql_password="{{ mysql_root_pass }}"
+file_restore_dir="{{ install_dir }}"
+script_name=$(basename "$0")
+
+get_most_recent_backup() {
+  type=$1
+  most_recent_backup=$(find "$backup_dir" -type f -name "*.${type}" -printf "%T@ %p\n" | sort -rn | head -n 1 | cut -d ' ' -f 2-)
+  echo "$most_recent_backup"
+}
+
+get_oldest_backup() {
+  type=$1
+  oldest_backup=$(find "$backup_dir" -type f -name "*.${type}" -printf "%T@ %p\n" | sort -n | head -n 1 | cut -d ' ' -f 2-)
+  echo "$oldest_backup"
+}
+
+get_most_recent_mysql_backup() {
+  most_recent_backup=$(get_most_recent_backup "sql")
+  echo "$most_recent_backup"
+}
+
+get_most_recent_file_backup() {
+  most_recent_backup=$(get_most_recent_backup "tar.gz")
+  echo "$most_recent_backup"
+}
+
+# Restore the oldest MySQL backup
+restore_oldest_mysql_backup() {
+    oldest_backup="$1"
+    if [ -n "$oldest_backup" ]; then
+        echo "Restoring MySQL backup file: $oldest_backup"
+        mysql -u "$mysql_user" -p"$mysql_password" < "$oldest_backup"
+    else
+        echo "No MySQL backups found."
+        exit 1
+    fi
+}
+
+# Restore the oldest file backup
+restore_oldest_file_backup() {
+    oldest_backup="$1"
+    if [ -n "$oldest_backup" ]; then
+        echo "Restoring user config backup: $oldest_backup"
+        tar -xzf "$oldest_backup" -C "$file_restore_dir" --overwrite
+    else
+        echo "No file backups found."
+        exit 1
+    fi
+}
+
+restore_mysql_backup() {
+  backup_file="$1"
+  if [ -f "$backup_file" ]; then
+    echo "Restoring MySQL backup file: $backup_file"
+    mysql -u "$mysql_user" -p"$mysql_password" < "$backup_file"
+  else
+    echo "MySQL backup file not found: $backup_file"
+    exit 1
+  fi
+}
+
+restore_file_backup() {
+  backup_file="$1"
+  if [ -f "$backup_file" ]; then
+    echo "Restoring user config backup: $backup_file"
+    tar -xzf "$backup_file" -C "$file_restore_dir" --overwrite
+  else
+    echo "File backup not found: $backup_file"
+    exit 1
+  fi
+}
+
+# Find the closest MySQL backup in age to the requested time frame
+find_closest_backup() {
+  n="$1"
+  unit="$2"
+  type=$3
+  case $unit in
+    "days")
+      time_unit="-mtime"
+      ;;
+    "weeks")
+      time_unit="-mtime"
+      n=$((n * 7))
+      ;;
+    *)
+      echo "Invalid time unit: $unit"
+      exit 1
+      ;;
+  esac
+
+  closest_backup=$(find "$backup_dir" -type f -name "*.${type}" $time_unit "-$n" -print -quit)
+  echo "$closest_backup"
+}
+
+# Provide user prompt if they want to restore the closest MySQL backup in age to the requested time frame
+restore_closest_mysql_backup() {
+  closest_backup="$1"
+  if [ -n "$closest_backup" ]; then
+    echo "MySQL backup from the requested time frame not found."
+    echo "The closest MySQL backup to the specified time frame is: $closest_backup"
+    while true; do
+      read -r -p "Would you like to restore $closest_backup? (y/n): " choice
+      case "$choice" in
+        y|Y)
+          restore_mysql_backup "$closest_backup"
+          return
+          ;;
+        n|N)
+          echo "Aborting restore process."
+          exit 0
+          ;;
+        *)
+          echo "Invalid choice. Please enter 'y' or 'n'."
+          ;;
+      esac
+    done
+  else
+    echo "MySQL backup from the requested time not found."
+    exit 1
+  fi
+}
+
+# Provide user prompt if they want to restore the closest file backup in age to the requested time frame
+restore_closest_file_backup() {
+  closest_backup="$1"
+  if [ -n "$closest_backup" ]; then
+    echo "File backup from the requested time frame not found."
+    echo "The closest file backup to the specified time frame is: $closest_backup"
+    while true; do
+      read -r -p "Would you like to restore $closest_backup? (y/n): " choice
+      case "$choice" in
+        y|Y)
+          restore_file_backup "$closest_backup"
+          return
+          ;;
+        n|N)
+          echo "Aborting restore process."
+          exit 0
+          ;;
+        *)
+          echo "Invalid choice. Please enter 'y' or 'n'."
+          ;;
+      esac
+    done
+  else
+    echo "File backup from the requested time not found."
+    exit 1
+  fi
+}
+
+# Restore a backup from N days/weeks ago
+restore_backup_from_n() {
+  n="$1"
+  unit="$2"
+  specific_mysql_backup=$(find "$backup_dir" -type f -name "*.sql" -mtime "-$((n * unit))" -print -quit)
+  specific_file_backup=$(find "$backup_dir" -type f -name "*.tar.gz" -mtime "-$((n * unit))" -print -quit)
+
+  if [ -n "$specific_mysql_backup" ] && [ -n "$specific_file_backup" ]; then
+    restore_mysql_backup "$specific_mysql_backup"
+    restore_file_backup "$specific_file_backup"
+  else
+    closest_mysql_backup=$(find_closest_backup "$n" "$unit" "sql")
+    closest_file_backup=$(find_closest_backup "$n" "$unit" "tar.gz")
+
+    if [ -n "$closest_mysql_backup" ] && [ -n "$closest_file_backup" ]; then
+      restore_closest_mysql_backup "$closest_mysql_backup"
+      restore_closest_file_backup "$closest_file_backup"
+    else
+      echo "No backups found from the requested time."
+      exit 1
+    fi
+  fi
+}
+
+print_usage() {
+  echo "Usage: $script_name [OPTIONS]"
+  echo "Restores a freshrss MySQL database backup and user data backup."
+  echo "Options:"
+  echo "  -s, --specific FILE     Restore a specific backup file"
+  echo "  -d, --days N            Restore a backup from N days ago"
+  echo "  -w, --weeks N           Restore a backup from N weeks ago"
+  echo "  -l, --latest            Restore the most recent backup"
+  echo "  -o, --oldest            Restore the oldest backup"
+  echo "  -h, --help              Print this help message"
+  exit 0
+}
+
+short_options="s:d:w:loh"
+long_options="specific:,days:,weeks:,oldest,latest,help"
+parsed_args=$(getopt -o $short_options -l $long_options -- "$@")
+eval set -- "$parsed_args"
+
+while true; do
+  case "$1" in
+    -s|--specific)
+      specific_backup="$2"
+      restore_mysql_backup "$specific_backup"
+      restore_file_backup "$specific_backup"
+      exit 0
+      ;;
+    -d|--days)
+      restore_backup_from_n "$2" "days"
+      exit 0
+      ;;
+    -w|--weeks)
+      restore_backup_from_n "$2" "weeks"
+      exit 0
+      ;;
+    -l|--latest)
+      most_recent_mysql_backup=$(get_most_recent_backup "sql")
+      most_recent_file_backup=$(get_most_recent_backup "tar.gz")
+      restore_mysql_backup "$most_recent_mysql_backup"
+      restore_file_backup "$most_recent_file_backup"
+      exit 0
+      ;;
+    -o|--oldest)
+      oldest_mysql_backup=$(get_oldest_backup "sql")
+      oldest_file_backup=$(get_oldest_backup "tar.gz")
+      restore_mysql_backup "$oldest_mysql_backup"
+      restore_file_backup "$oldest_file_backup"
+      exit 0
+      ;;
+    -h|--help)
+      print_usage
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      echo "Invalid option: $1"
+      print_usage
+      ;;
+  esac
+done
+
+# If no options are provided, print usage by default
+if [ $# -eq 0 ]; then
+  print_usage
+fi

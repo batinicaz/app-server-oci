@@ -1,0 +1,45 @@
+- name: Install unzip
+  ansible.builtin.package:
+    name: unzip
+    state: present
+  when: extension.format is defined and extension.format == '.zip'
+
+- name: Set repo path
+  ansible.builtin.set_fact:
+    repo_path: "/tmp/{{ extension.name }}"
+  when: extension.source.endswith('.git')
+
+- name: Clone git repository for {{ extension.name }}
+  ansible.builtin.git:
+    repo: "{{ extension.source }}"
+    dest: "{{ repo_path }}"
+    version: "{{ extension.version | default('master') }}"
+    depth: 1
+  when: extension.source.endswith('.git')
+
+- name: Install {{ extension.name }}
+  ansible.builtin.copy:
+    src: "{{ repo_path }}"
+    dest: "{{ install_dir }}/extensions/{{ extension.name }}"
+    remote_src: true
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  when: extension.source.endswith('.git')
+
+- name: Install {{ extension.name }}
+  ansible.builtin.unarchive:
+    src: "{{ extension.source }}"
+    dest: "{{ install_dir }}/extensions"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    remote_src: true
+
+  when: not extension.source.endswith('.git')
+
+- name: Remove cloned repo
+  ansible.builtin.file:
+    path: "{{ repo_path }}"
+    state: absent
+  when: repo_path is defined

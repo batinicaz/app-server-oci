@@ -1,0 +1,85 @@
+- name: Install pre reqs
+  ansible.builtin.apt:
+    pkg:
+      - php-fpm
+      - php-curl
+      - php-json
+      - php-mbstring
+      - php-mysql
+      - php-xml
+      - php-zip
+
+- name: Get latest release
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/FreshRSS/FreshRSS/releases/latest"
+    method: GET
+    return_content: true
+  register: freshrss_release
+
+- name: Download latest release
+  ansible.builtin.get_url:
+    # checkov:skip=CKV2_ANSIBLE_2 URL is https but checkov can not tell
+    url: "{{ freshrss_release.json.tarball_url }}"
+    dest: "/tmp/freshrss.tar.gz"
+    mode: '0644'
+  register: freshrss_download
+
+- name: Create install dir
+  ansible.builtin.file:
+    path: "{{ install_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Extract downloaded release
+  ansible.builtin.unarchive:
+    src: "{{ freshrss_download.dest }}"
+    dest: "{{ install_dir }}"
+    remote_src: true
+    extra_opts: "--strip-components=1"
+
+- name: Set ownership of install directory
+  ansible.builtin.file:
+    path: "{{ install_dir }}"
+    state: directory
+    recurse: true
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Cleanup downloaded archive
+  ansible.builtin.file:
+    path: "{{ freshrss_download.dest }}"
+    state: absent
+
+- name: Perform first time setup
+  ansible.builtin.command:
+    cmd: "sudo -u www-data ./cli/do-install.php --default_user {{ freshrss_web_username }} --auth_type form --environment production --language en --title FreshRSS --api_enabled --db-type mysql --db-host localhost:3306 --db-user freshrss --db-password {{ mysql_freshrss_pass }} --db-base freshrss --disable_update"
+    chdir: "{{ install_dir }}"
+    creates: /opt/freshrss/data/applied_migrations.txt
+
+- name: Create user
+  ansible.builtin.command:
+    cmd: "sudo -u www-data ./cli/create-user.php --user {{ freshrss_web_username }} --password '{{ freshrss_web_password }}' --language en --no_default_feeds"
+    chdir: "{{ install_dir }}"
+  register: command_output
+  changed_when: "'FreshRSS warning: username already exists' not in command_output.stdout"
+
+- name: Install extensions
+  ansible.builtin.include_tasks: extensions.yml
+  loop: "{{ extensions }}"
+  loop_control:
+    loop_var: extension
+
+- name: Create Nginx config file
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/freshrss.conf
+    mode: '0644'
+
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+
+- name: Setup backups
+  ansible.builtin.include_tasks: backups.yml

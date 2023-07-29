@@ -1,0 +1,32 @@
+server {
+	listen 80;
+
+	server_name freshrss;
+
+	root {{ install_dir }}/p/;
+
+	index index.php index.html index.htm;
+
+	access_log /var/log/nginx/freshrss.access.log;
+	error_log /var/log/nginx/freshrss.error.log crit;
+
+	server_tokens off;
+
+	location ~ ^.+?\.php(/.*)?$ {
+        # Mitigate https://httpoxy.org/ vulnerabilities
+        fastcgi_param HTTP_PROXY "";
+
+        set $path_info $fastcgi_path_info;
+        fastcgi_param PATH_INFO $path_info;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass unix:/var/run/php/php-fpm.sock;
+
+        include fastcgi_params;
+
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+	}
+
+	location / {
+		try_files $uri $uri/ index.php;
+	}
+}
