@@ -1,0 +1,5 @@
+- name: Restart AppArmor
+  ansible.builtin.systemd_service:
+    name: apparmor
+    enabled: true
+    state: restarted

@@ -1,0 +1,27 @@
+- name: Install AppArmor
+  ansible.builtin.apt:
+    name:
+      - apparmor
+      - apparmor-utils
+    state: present
+
+- name: Put in place AppArmor profile for Nginx
+  ansible.builtin.copy:
+    src: usr.sbin.nginx
+    dest: /etc/apparmor.d/
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart AppArmor
+
+- name: Put in place AppArmor profile for PHP
+  ansible.builtin.copy:
+    src: usr.sbin.phpfpm
+    dest: /etc/apparmor.d/
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart AppArmor
+
+- name: Flush handlers to ensure AppArmor is reloaded before nginx starts
+  ansible.builtin.meta: flush_handlers

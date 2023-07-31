@@ -62,7 +62,8 @@
     cmd: "sudo -u www-data ./cli/create-user.php --user {{ freshrss_web_username }} --password '{{ freshrss_web_password }}' --language en --no_default_feeds"
     chdir: "{{ install_dir }}"
   register: command_output
-  changed_when: "'FreshRSS warning: username already exists' not in command_output.stdout"
+  changed_when: "'FreshRSS warning: username already exists' not in command_output.stderr"
+  failed_when: "command_output.rc != 0 and 'FreshRSS warning: username already exists' not in command_output.stderr"
 
 - name: Install extensions
   ansible.builtin.include_tasks: extensions.yml
