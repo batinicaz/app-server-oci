@@ -1,0 +1,2 @@
+- name: Setup iptables
+  ansible.builtin.include_tasks: firewall.yml

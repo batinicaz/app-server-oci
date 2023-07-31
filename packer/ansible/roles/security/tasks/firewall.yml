@@ -1,0 +1,78 @@
+- name: Setup iptables
+  ansible.builtin.apt:
+    name:
+      - iptables
+      - iptables-persistent
+    state: present
+    update_cache: yes
+
+- name: Flush rules from default chains
+  ansible.builtin.iptables:
+    flush: true
+    chain: "{{ item }}"
+  loop:
+    - INPUT
+    - FORWARD
+    - OUTPUT
+
+- name: Set default policies
+  ansible.builtin.iptables:
+    policy: ACCEPT
+    chain: "{{ item }}"
+  loop:
+    - INPUT
+    - FORWARD
+    - OUTPUT
+
+- name: Create chain for ansible managed rules to OCI services
+  ansible.builtin.iptables:
+    chain: "OCIServices"
+    state: present
+    chain_management: true
+
+- name: Apply iptables rules
+  ansible.builtin.iptables:
+    action: "{{ item.action | default('append') }}"
+    comment: "Managed by Ansible"
+    destination: "{{ item.destination | default('0.0.0.0/0') }}"
+    destination_port: "{{ item.destination_port | default(omit) }}"
+    flush: "{{ item.flush | default(false) }}"
+    source: "{{ item.source | default('0.0.0.0/0') }}"
+    state: "{{ item.state | default('present') }}"
+    to_destination: "{{ item.to_destination | default(omit) }}"
+    to_ports: "{{ item.to_ports | default(omit) }}"
+    table: "{{ item.table | default('filter') }}"
+    chain: "{{ item.chain }}"
+    ctstate: "{{ item.ctstate | default(omit) }}"
+    jump: "{{ item.jump }}"
+    protocol: "{{ item.protocol | default(omit) }}"
+    in_interface: "{{ item.in_interface | default(omit) }}"
+    source_port: "{{ item.source_port | default(omit) }}"
+    match: "{{ item.match | default(omit) }}"
+    reject_with: "{{ item.reject_with | default(omit) }}"
+    uid_owner: "{{ item.uid_owner | default(omit) }}"
+  loop: "{{ iptables_rules }}"
+
+- name: Remove rules associated with the default InstanceServices chain
+  ansible.builtin.iptables:
+    chain: "InstanceServices"
+    flush: true
+  when: local_dev is not defined
+
+- name: Delete default InstanceServices chain
+  ansible.builtin.iptables:
+    chain: "InstanceServices"
+    state: absent
+    chain_management: true
+
+- name: Save rules
+  community.general.iptables_state:
+    ip_version: ipv4
+    state: saved
+    path: /etc/iptables/rules.v4
+
+- name: Ensure rules are persisted
+  ansible.builtin.systemd:
+    name: netfilter-persistent
+    state: restarted
+    enabled: true

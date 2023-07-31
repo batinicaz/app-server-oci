@@ -5,8 +5,8 @@
     - vault.yml
   roles:
     - role: setup
+    - role: security
     - role: geerlingguy.mysql
-      src: https://github.com/geerlingguy/ansible-role-mysql/archive/master.tar.gz
       vars:
         mysql_databases:
           - name: freshrss
