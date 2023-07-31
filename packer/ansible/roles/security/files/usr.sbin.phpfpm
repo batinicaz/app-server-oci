@@ -1,0 +1,36 @@
+include <tunables/global>
+
+/usr/sbin/php-fpm* {
+  include <abstractions/base>
+  include <abstractions/nameservice>
+  include <abstractions/openssl>
+  include <abstractions/php>
+  include <abstractions/user-tmp>
+
+  capability chown,
+  capability dac_override,
+  capability dac_read_search,
+  capability kill,
+  capability net_admin,
+  capability setgid,
+  capability setuid,
+
+  /etc/php/*/fpm/** r,
+  /opt/freshrss/p/** r,
+  /run/mysqld/mysqld.sock rw,
+  /run/php/php8.1-fpm.sock w,
+  /usr/sbin/php-fpm* r,
+  /var/log/php/** rw,
+  /var/run/php/php-fpm.sock w,
+  owner /opt/freshrss/** k,
+  owner /opt/freshrss/** r,
+  owner /opt/freshrss/** w,
+  owner /opt/freshrss/*.php r,
+  owner /opt/freshrss/app/* r,
+  owner /opt/freshrss/lib/* r,
+  owner /run/php/php8.1-fpm.pid w,
+  owner /run/php/php8.1-fpm.sock rw,
+  owner /run/systemd/notify w,
+  owner /var/log/php8.1-fpm.log w,
+
+}

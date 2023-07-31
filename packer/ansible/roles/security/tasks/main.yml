@@ -1,2 +1,5 @@
 - name: Setup iptables
   ansible.builtin.include_tasks: firewall.yml
+
+- name: Setup AppArmor
+  ansible.builtin.include_tasks: apparmor.yml
