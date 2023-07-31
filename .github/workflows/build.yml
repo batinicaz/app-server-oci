@@ -66,6 +66,7 @@ jobs:
         uses: ./.github/actions/cleanup
         with:
           compartmentId: "${{ secrets.TERRAFORM_TENANCY_OCID }}"
+          dryRun: "${{ github.ref != 'refs/heads/main' }}"
           fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
           privateKey: "${{ secrets.OCI_PRIVATE_KEY }}"
           region: "${{ vars.OCI_REGION }}"
