@@ -1,0 +1,14 @@
+include <tunables/global>
+
+/opt/nitter/nitter {
+  include <abstractions/base>
+  include <abstractions/nameservice>
+  include <abstractions/openssl>
+
+  network inet tcp,
+
+  deny /** wlk,
+
+  /opt/nitter/** r,
+  /opt/nitter/nitter rix,
+}

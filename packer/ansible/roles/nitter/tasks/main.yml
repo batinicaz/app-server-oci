@@ -1,0 +1,73 @@
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - libpcre3
+      - redis-server
+    state: present
+
+- name: Enable and start Redis
+  ansible.builtin.systemd:
+    name: redis-server
+    enabled: true
+    state: started
+
+- name: Create user to run nitter
+  ansible.builtin.user:
+    name: nitter
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+  register: nitter_user
+
+- name: Find the latest release of Nitter
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/batinicaz/build-nitter/releases/latest
+    return_content: true
+    headers:
+      Accept: "application/vnd.github.v3+json"
+  register: latest_nitter_release
+
+- name: Create nitter directory
+  ansible.builtin.file:
+    path: "/opt/nitter"
+    state: directory
+    mode: '0700'
+    owner: "{{ nitter_user.name }}"
+    group: "{{ nitter_user.group }}"
+  register: nitter_install_dir
+
+- name: Download and extract latest release
+  ansible.builtin.unarchive:
+    # Grab the ARM release if building locally
+    src: "{{ latest_nitter_release.json.assets[local_dev is defined | ternary(1, 0)].browser_download_url }}"
+    dest: "/opt/nitter"
+    remote_src: true
+    creates: "/opt/nitter/nitter"
+    owner: "{{ nitter_user.name }}"
+    group: "{{ nitter_user.group }}"
+    mode: '0755'
+
+- name: Generate a cryptographic salt for use in configuration
+  ansible.builtin.command: openssl rand -base64 32
+  changed_when: true
+  register: salt
+
+- name: Set up Nitter configuration
+  ansible.builtin.template:
+    src: "nitter.conf.j2"
+    dest: "/opt/nitter/nitter.conf"
+    owner: "{{ nitter_user.name }}"
+    group: "{{ nitter_user.group }}"
+    mode: '0644'
+
+- name: Set up Nitter service
+  ansible.builtin.template:
+    src: "nitter.service.j2"
+    dest: "/etc/systemd/system/nitter.service"
+    mode: '0600'
+
+- name: Enable and start Nitter
+  ansible.builtin.systemd:
+    name: nitter
+    enabled: true
+    state: started

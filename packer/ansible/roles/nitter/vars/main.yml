@@ -1,0 +1,3 @@
+nitter_repo: "https://github.com/zedeus/nitter.git"
+nitter_dir: "/opt/nitter"
+nim_version: "1.6.14"

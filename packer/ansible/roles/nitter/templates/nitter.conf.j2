@@ -1,0 +1,35 @@
+[Server]
+hostname = "nitter.net"
+title = "nitter"
+address = "0.0.0.0"
+port = 8080
+https = false
+httpMaxConnections = 10
+staticDir = "./public"
+
+[Cache]
+listMinutes = 240  # how long to cache list info (not the tweets, so keep it high)
+rssMinutes = 10  # how long to cache rss queries
+redisHost = "localhost"
+redisPort = 6379
+redisPassword = ""
+redisConnections = 20  # minimum open connections in pool
+redisMaxConnections = 30
+
+[Config]
+hmacKey = "{{ salt.stdout }}"
+base64Media = false
+enableRSS = true
+enableDebug = false
+proxy = ""
+proxyAuth = ""
+tokenCount = 10
+
+# Change default preferences here, see src/prefs_impl.nim for a complete list
+[Preferences]
+theme = "Nitter"
+replaceTwitter = "nitter.net"
+replaceYouTube = "piped.video"
+proxyVideos = false
+hlsPlayback = true
+infiniteScroll = true
