@@ -20,4 +20,5 @@
             host: localhost
     - role: nginx
     - role: freshrss
+    - role: nitter
     - role: cleanup

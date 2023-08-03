@@ -4,7 +4,7 @@
       - iptables
       - iptables-persistent
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Flush rules from default chains
   ansible.builtin.iptables:

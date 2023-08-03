@@ -1,0 +1,22 @@
+[Unit]
+Description=Nitter (An alternative Twitter front-end)
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+
+User={{ nitter_user.name }}
+Group={{ nitter_user.group }}
+
+ExecStart={{ nitter_dir }}/nitter
+WorkingDirectory={{ nitter_dir }}
+
+StandardOutput=file:/var/log/nitter.log
+StandardError=file:/var/log/nitter.log
+
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

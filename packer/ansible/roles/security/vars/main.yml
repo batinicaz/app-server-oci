@@ -31,6 +31,12 @@ iptables_rules:
     match: "tcp"
     destination_port: "80"
     jump: "ACCEPT"
+  # Allow Nitter
+  - chain: "INPUT"
+    protocol: "tcp"
+    match: "tcp"
+    destination_port: "8080"
+    jump: "ACCEPT"
   # Default reject rule
   - chain: "INPUT"
     jump: "REJECT"
