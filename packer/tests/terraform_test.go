@@ -13,7 +13,8 @@ import (
 
 var (
 	ingressTypes = map[string]string{
-		"80": "http",
+		"80":   "http",
+		"8080": "http",
 	}
 )
 

@@ -1,0 +1,32 @@
+- name: Add Tailscale Signing Key
+  become: true
+  ansible.builtin.get_url:
+    url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
+    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    mode: '0644'
+
+- name: Add Tailscale repo
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main"
+    filename: tailscale
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - gnupg2
+      - gnupg-agent
+      - apt-transport-https
+      - python3-apt
+    state: present
+
+- name: Install tailscale
+  ansible.builtin.apt:
+    name: tailscale
+    state: present
+    update_cache: true
+
+- name: Enable tailscale
+  ansible.builtin.service:
+    name: tailscaled
+    state: started
+    enabled: true

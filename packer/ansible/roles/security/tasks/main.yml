@@ -3,3 +3,6 @@
 
 - name: Setup AppArmor
   ansible.builtin.include_tasks: apparmor.yml
+
+- name: Setup tailscale
+  ansible.builtin.include_tasks: tailscale.yml
