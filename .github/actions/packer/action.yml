@@ -63,7 +63,7 @@ runs:
 
     - name: Set hcpBucketName flag
       run: |
-        hcpBucketName='gha-branch-build'
+        hcpBucketName='unstable'
         if [[ "${{ github.ref_name }}" == "main" ]]; then
           hcpBucketName='stable'
         fi

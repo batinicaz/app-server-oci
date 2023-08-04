@@ -120,7 +120,7 @@ build {
   }
 
   hcp_packer_registry {
-    bucket_name = "oci-images-${var.hcp_packer_bucket_name}"
+    bucket_name = "oci-images-freshrss-${var.hcp_packer_bucket_name}"
     description = "Images for Oracle Cloud Infrastructure"
 
     bucket_labels = {
