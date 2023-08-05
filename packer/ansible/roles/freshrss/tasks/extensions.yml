@@ -19,8 +19,8 @@
 
 - name: Install {{ extension.name }}
   ansible.builtin.copy:
-    src: "{{ repo_path }}"
-    dest: "{{ install_dir }}/extensions/{{ extension.name }}"
+    src: "{{ repo_path }}/{{ extension.directory }}"
+    dest: "{{ install_dir }}/extensions/"
     remote_src: true
     owner: www-data
     group: www-data

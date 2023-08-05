@@ -20,12 +20,7 @@ include <tunables/global>
   /var/log/nginx/** rw,
   /var/run/nginx.pid w,
   owner /run/nginx.pid rw,
-  owner /var/cache/nginx/client_temp/ w,
-  owner /var/cache/nginx/fastcgi_temp/ w,
-  owner /var/cache/nginx/proxy_temp/ w,
-  owner /var/cache/nginx/scgi_temp/ w,
-  owner /var/cache/nginx/uwsgi_temp/ w,
-
+  owner /var/cache/nginx/** rw,
 
   ^worker {
     /etc/nginx/** r,
