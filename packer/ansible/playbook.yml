@@ -12,10 +12,10 @@
           - name: freshrss
             encoding: utf8
             collation: utf8_general_ci
-        mysql_root_password: "{{ mysql_root_pass }}"
+        mysql_root_password: "{{ mysql.root }}"
         mysql_users:
           - name: freshrss
-            password: "{{ mysql_freshrss_pass }}"
+            password: "{{ mysql.freshrss }}"
             priv: '*.*:ALL,GRANT'
             host: localhost
     - role: nginx
