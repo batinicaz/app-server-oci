@@ -31,7 +31,7 @@
     depth: 1
 
 - name: Set permissions for site configuration
-  file:
+  ansible.builtin.file:
     path: "{{ fulltext_rss_install_dir }}/{{ fulltext_rss_config_dir }}"
     state: directory
     recurse: true
