@@ -22,4 +22,17 @@
     - role: freshrss
     - role: fulltextrss
     - role: nitter
+    - role: logrotate
+      vars:
+        services:
+          - name: freshrss
+            logs:
+              - /var/log/freshrss-feed-update.log
+              - "{{ freshrss_install_dir }}/data/users/_/log.txt"
+              - "{{ freshrss_install_dir }}/data/users/{{ freshrss.user }}/log.txt"
+              - /var/log/nginx/freshrss.access.log
+              - /var/log/nginx/freshrss.error.log
+          - name: nginx
+            logs:
+              - /var/log/nginx/error.log
     - role: cleanup
