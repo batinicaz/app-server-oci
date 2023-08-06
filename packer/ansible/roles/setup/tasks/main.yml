@@ -9,13 +9,31 @@
     state: absent
     purge: true
 
+- name: Remove bloat
+  ansible.builtin.apt:
+    name:
+      - snapd
+      - ubuntu-advantage-tools
+    autoremove: true
+    state: absent
+    purge: true
+
+- name: Remove snap
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /home/ubuntu/snap
+    - /root/snap
+    - /var/cache/snapd
+
 - name: Block telemetry domains
   ansible.builtin.lineinfile:
     path: /etc/hosts
     line: "127.0.0.1 {{ item }}"
   loop: "{{ telemetry_domains + telemetry_domains | map('regex_replace', '^', 'www.') | list }}"
 
-- name: Disable MOTD noise
+- name: Remove MOTD noise
   ansible.builtin.file:
     path: "/etc/update-motd.d/{{ item }}"
     state: absent
