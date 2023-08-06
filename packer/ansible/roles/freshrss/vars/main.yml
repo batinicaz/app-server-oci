@@ -1,5 +1,5 @@
 backup_dir: "/backups"
-install_dir: /opt/freshrss
+freshrss_install_dir: /opt/freshrss
 extensions:
   - name: ReadingTime
     source: https://github.com/FreshRSS/Extensions.git

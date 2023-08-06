@@ -26,20 +26,20 @@
 
 - name: Create install dir
   ansible.builtin.file:
-    path: "{{ install_dir }}"
+    path: "{{ freshrss_install_dir }}"
     state: directory
     mode: '0755'
 
 - name: Extract downloaded release
   ansible.builtin.unarchive:
     src: "{{ freshrss_download.dest }}"
-    dest: "{{ install_dir }}"
+    dest: "{{ freshrss_install_dir }}"
     remote_src: true
     extra_opts: "--strip-components=1"
 
 - name: Set ownership of install directory
   ansible.builtin.file:
-    path: "{{ install_dir }}"
+    path: "{{ freshrss_install_dir }}"
     state: directory
     recurse: true
     owner: www-data
@@ -54,13 +54,13 @@
 - name: Perform first time setup
   ansible.builtin.command:
     cmd: "sudo -u www-data ./cli/do-install.php --default_user {{ freshrss.user }} --auth_type form --environment production --language en --title FreshRSS --api_enabled --db-type mysql --db-host localhost:3306 --db-user freshrss --db-password {{ mysql.freshrss }} --db-base freshrss --disable_update"
-    chdir: "{{ install_dir }}"
+    chdir: "{{ freshrss_install_dir }}"
     creates: /opt/freshrss/data/applied_migrations.txt
 
 - name: Create user
   ansible.builtin.command:
     cmd: "sudo -u www-data ./cli/create-user.php --user {{ freshrss.user }} --password '{{ freshrss.password }}' --language en --no_default_feeds"
-    chdir: "{{ install_dir }}"
+    chdir: "{{ freshrss_install_dir }}"
   register: command_output
   changed_when: "'FreshRSS warning: username already exists' not in command_output.stderr"
   failed_when: "command_output.rc != 0 and 'FreshRSS warning: username already exists' not in command_output.stderr"
@@ -72,7 +72,7 @@
     hour: "*"
     minute: "*/20"
     user: www-data
-    job: "php -f {{ install_dir }}/app/actualize_script.php > /var/log/freshrss-feed-update.log 2>&1 && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/b04fc65e-865e-4b96-99ff-708e243fa20c"
+    job: "php -f {{ freshrss_install_dir }}/app/actualize_script.php > /var/log/freshrss-feed-update.log 2>&1 && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/b04fc65e-865e-4b96-99ff-708e243fa20c"
 
 - name: Install extensions
   ansible.builtin.include_tasks: extensions.yml

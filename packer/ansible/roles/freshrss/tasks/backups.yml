@@ -13,7 +13,7 @@
     hour: "0"
     minute: "55"
     user: root
-    job: "tar -zcvf {{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').tar.gz -C {{ install_dir }} data/users && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/baf6b517-5996-4cb2-95a4-f67623f90797"
+    job: "tar -zcvf {{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').tar.gz -C {{ freshrss_install_dir }} data/users && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/baf6b517-5996-4cb2-95a4-f67623f90797"
 
 - name: Setup DB backup cronjob (every day at 1AM)
   ansible.builtin.cron:
