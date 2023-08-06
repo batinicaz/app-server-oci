@@ -1,0 +1,3 @@
+telemetry_domains:
+  - metrics.ubuntu.com
+  - popcon.ubuntu.com

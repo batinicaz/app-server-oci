@@ -1,3 +1,20 @@
+- name: Remove telemetry packages
+  ansible.builtin.apt:
+    name:
+      - apport
+      - popularity-contest
+      - ubuntu-report
+      - whoopsie
+    autoremove: true
+    state: absent
+    purge: true
+
+- name: Block telemetry domains
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 {{ item }}"
+  loop: "{{ telemetry_domains + telemetry_domains | map('regex_replace', '^', 'www.') | list }}"
+
 - name: Update all packages
   ansible.builtin.apt:
     name: "*"
