@@ -1,0 +1,11 @@
+version: '3'
+services:
+  ftr:
+    image: {{ fulltext_rss_image }}
+    restart: always
+    volumes:
+      - ./cache:/var/www/html/cache
+      - ./{{ fulltext_rss_config_dir }}:/var/www/html/site_config/standard
+      - ./{{ fulltext_rss_config_file }}:/var/www/html/{{ fulltext_rss_config_file }}
+    ports:
+      - 3000:80

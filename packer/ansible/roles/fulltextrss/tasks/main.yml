@@ -1,0 +1,60 @@
+# Needs to be Dockerised due to free version of fulltext_rss only supporting legacy PHP5.
+# credit to https://github.com/heussd/fivefilters-full-text-rss-docker/tree/master
+# for building/maintaining a working docker image
+
+- name: Setup Docker
+  ansible.builtin.include_role:
+    name: geerlingguy.docker
+  vars:
+    docker_install_compose_plugin: true
+    docker_install_compose: false
+
+- name: Create install directory
+  ansible.builtin.file:
+    path: "{{ fulltext_rss_install_dir }}"
+    state: directory
+    mode: '0700'
+
+- name: Put custom configuration in place
+  ansible.builtin.template:
+    src: custom_config.php.j2
+    dest: "{{ fulltext_rss_install_dir }}/{{ fulltext_rss_config_file }}"
+    owner: www-data
+    group: www-data
+    mode: '0700'
+
+- name: Fetch latest version of site configurations
+  ansible.builtin.git:
+    repo: https://github.com/fivefilters/ftr-site-config.git
+    dest: "{{ fulltext_rss_install_dir }}/{{ fulltext_rss_config_dir }}"
+    version: 'master'
+    depth: 1
+
+- name: Set permissions for site configuration
+  file:
+    path: "{{ fulltext_rss_install_dir }}/{{ fulltext_rss_config_dir }}"
+    state: directory
+    recurse: true
+    owner: www-data
+    group: www-data
+    mode: '700'
+
+- name: Create compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ fulltext_rss_install_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Fetch latest docker image
+  ansible.builtin.command: docker compose pull
+  args:
+    chdir: "{{ fulltext_rss_install_dir }}"
+  changed_when: true
+
+- name: Start service
+  ansible.builtin.command: docker compose up --detach
+  args:
+    chdir: "{{ fulltext_rss_install_dir }}"
+  changed_when: true
