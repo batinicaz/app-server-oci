@@ -13,7 +13,7 @@
     hour: "0"
     minute: "55"
     user: root
-    job: "tar -zcvf {{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').tar.gz -C {{ install_dir }} data/users && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/baf6b517-5996-4cb2-95a4-f67623f90797"
+    job: "tar -zcvf {{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').tar.gz -C {{ freshrss_install_dir }} data/users && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/baf6b517-5996-4cb2-95a4-f67623f90797"
 
 - name: Setup DB backup cronjob (every day at 1AM)
   ansible.builtin.cron:
@@ -22,7 +22,7 @@
     hour: "1"
     minute: "0"
     user: root
-    job: "mysqldump --skip-comments --user=root --password='{{ mysql_root_pass }}' --all-databases > \"{{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').sql\" && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/f0aadcfa-027e-40f7-a672-f5a59895ecc5"
+    job: "mysqldump --skip-comments --user=root --password='{{ mysql.root }}' --all-databases > \"{{ backup_dir }}/$(date +'%Y-%m-%d_%H-%M-%S').sql\" && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/f0aadcfa-027e-40f7-a672-f5a59895ecc5"
 
 - name: Create restore tool
   ansible.builtin.template:

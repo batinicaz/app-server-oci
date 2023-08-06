@@ -12,13 +12,27 @@
           - name: freshrss
             encoding: utf8
             collation: utf8_general_ci
-        mysql_root_password: "{{ mysql_root_pass }}"
+        mysql_root_password: "{{ mysql.root }}"
         mysql_users:
           - name: freshrss
-            password: "{{ mysql_freshrss_pass }}"
+            password: "{{ mysql.freshrss }}"
             priv: '*.*:ALL,GRANT'
             host: localhost
     - role: nginx
     - role: freshrss
+    - role: fulltextrss
     - role: nitter
+    - role: logrotate
+      vars:
+        services:
+          - name: freshrss
+            logs:
+              - /var/log/freshrss-feed-update.log
+              - "{{ freshrss_install_dir }}/data/users/_/log.txt"
+              - "{{ freshrss_install_dir }}/data/users/{{ freshrss.user }}/log.txt"
+              - /var/log/nginx/freshrss.access.log
+              - /var/log/nginx/freshrss.error.log
+          - name: nginx
+            logs:
+              - /var/log/nginx/error.log
     - role: cleanup

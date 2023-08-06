@@ -1,3 +1,50 @@
+- name: Remove telemetry packages
+  ansible.builtin.apt:
+    name:
+      - apport
+      - popularity-contest
+      - ubuntu-report
+      - whoopsie
+    autoremove: true
+    state: absent
+    purge: true
+
+- name: Remove bloat
+  ansible.builtin.apt:
+    name:
+      - snapd
+      - ubuntu-advantage-tools
+    autoremove: true
+    state: absent
+    purge: true
+
+- name: Remove snap
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /home/ubuntu/snap
+    - /root/snap
+    - /var/cache/snapd
+
+- name: Block telemetry domains
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 {{ item }}"
+  loop: "{{ telemetry_domains + telemetry_domains | map('regex_replace', '^', 'www.') | list }}"
+
+- name: Remove MOTD noise
+  ansible.builtin.file:
+    path: "/etc/update-motd.d/{{ item }}"
+    state: absent
+  loop:
+    - 10-help-text
+    - 50-motd-news
+    - 80-livepatch
+    - 88-esm-announce
+    - 91-contract-ua-esm-status
+    - 95-hwe-eol
+
 - name: Update all packages
   ansible.builtin.apt:
     name: "*"

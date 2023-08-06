@@ -2,8 +2,8 @@
 
 backup_dir="{{ backup_dir }}"
 mysql_user="root"
-mysql_password="{{ mysql_root_pass }}"
-file_restore_dir="{{ install_dir }}"
+mysql_password="{{ mysql.root }}"
+file_restore_dir="{{ freshrss_install_dir }}"
 script_name=$(basename "$0")
 
 get_most_recent_backup() {

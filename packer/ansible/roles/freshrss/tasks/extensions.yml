@@ -20,7 +20,7 @@
 - name: Install {{ extension.name }}
   ansible.builtin.copy:
     src: "{{ repo_path }}/{{ extension.directory }}"
-    dest: "{{ install_dir }}/extensions/"
+    dest: "{{ freshrss_install_dir }}/extensions/"
     remote_src: true
     owner: www-data
     group: www-data
@@ -30,7 +30,7 @@
 - name: Install {{ extension.name }}
   ansible.builtin.unarchive:
     src: "{{ extension.source }}"
-    dest: "{{ install_dir }}/extensions"
+    dest: "{{ freshrss_install_dir }}/extensions"
     owner: www-data
     group: www-data
     mode: '0755'

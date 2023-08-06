@@ -37,6 +37,12 @@ iptables_rules:
     match: "tcp"
     destination_port: "8080"
     jump: "ACCEPT"
+  # Allow Full Text RSS
+  - chain: "INPUT"
+    protocol: "tcp"
+    match: "tcp"
+    destination_port: "3000"
+    jump: "ACCEPT"
   # Default reject rule
   - chain: "INPUT"
     jump: "REJECT"
