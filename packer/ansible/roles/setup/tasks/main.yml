@@ -61,3 +61,8 @@
   ansible.builtin.pip:
     name: oci-cli
     state: present
+
+- name: Configure rsyslog to redirect cron logs
+  ansible.builtin.lineinfile:
+    path: "/etc/rsyslog.d/50-default.conf"
+    line: "cron.*    {{ cron_log }}"

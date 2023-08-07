@@ -11,8 +11,8 @@ variable "hcp_packer_bucket_name" {
 
 variable "instance_shape" {
   type        = string
-  default     = "VM.Standard.E2.1.Micro"
-  description = "Instance type to use, default is the always free domain x86 option."
+  default     = "VM.Standard.A1.Flex"
+  description = "Instance type to use, default is the always free domain ARM option."
 }
 
 variable "oci_key_file" {
@@ -88,6 +88,10 @@ source "oracle-oci" "ubuntu" {
     operating_system_version = var.ubuntu_version
   }
 
+  create_vnic_details {
+    display_name = "packer-build-freshrss-${var.version}"
+  }
+
   defined_tags_json = jsonencode({
     terraform = {
       managed = "packer"
@@ -103,6 +107,11 @@ source "oracle-oci" "ubuntu" {
       repo    = "https://github.com/batinicaz/freshrss-oci"
     }
   })
+
+  shape_config {
+    ocpus         = 1
+    memory_in_gbs = 6
+  }
 }
 
 build {
