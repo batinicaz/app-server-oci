@@ -27,7 +27,7 @@
         services:
           - name: freshrss
             logs:
-              - /var/log/freshrss-feed-update.log
+              - "{{ freshrss_feed_update_log.dest }}"
               - "{{ freshrss_install_dir }}/data/users/_/log.txt"
               - "{{ freshrss_install_dir }}/data/users/{{ freshrss.user }}/log.txt"
               - /var/log/nginx/freshrss.access.log

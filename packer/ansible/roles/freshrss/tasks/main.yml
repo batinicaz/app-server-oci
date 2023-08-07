@@ -65,6 +65,15 @@
   changed_when: "'FreshRSS warning: username already exists' not in command_output.stderr"
   failed_when: "command_output.rc != 0 and 'FreshRSS warning: username already exists' not in command_output.stderr"
 
+- name: Create log file for tracking auto refresh of feeds
+  ansible.builtin.file:
+    path: "/var/log/freshrss-feed-update.log"
+    state: touch
+    group: 'www-data'
+    mode: '0644'
+    owner: 'www-data'
+  register: freshrss_feed_update_log
+
 - name: Setup cronjob to auto refresh feeds
   ansible.builtin.cron:
     name: FreshRSS Feed Update
@@ -72,7 +81,7 @@
     hour: "*"
     minute: "*/20"
     user: www-data
-    job: "php -f {{ freshrss_install_dir }}/app/actualize_script.php > /var/log/freshrss-feed-update.log 2>&1 && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/b04fc65e-865e-4b96-99ff-708e243fa20c"
+    job: "php -f {{ freshrss_install_dir }}/app/actualize_script.php > {{ freshrss_feed_update_log.dest }} 2>&1 && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/b04fc65e-865e-4b96-99ff-708e243fa20c"
 
 - name: Install extensions
   ansible.builtin.include_tasks: extensions.yml
