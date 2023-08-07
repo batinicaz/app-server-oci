@@ -8,13 +8,13 @@ script_name=$(basename "$0")
 
 get_most_recent_backup() {
   type=$1
-  most_recent_backup=$(find "$backup_dir" -type f -name "*.${type}" -printf "%T@ %p\n" | sort -rn | head -n 1 | cut -d ' ' -f 2-)
+  most_recent_backup=$(find "$backup_dir" -type f -name "*.${type}" | sort -rV | head -n 1)
   echo "$most_recent_backup"
 }
 
 get_oldest_backup() {
   type=$1
-  oldest_backup=$(find "$backup_dir" -type f -name "*.${type}" -printf "%T@ %p\n" | sort -n | head -n 1 | cut -d ' ' -f 2-)
+  oldest_backup=$(find "$backup_dir" -type f -name "*.${type}" | sort -V | head -n 1)
   echo "$oldest_backup"
 }
 
