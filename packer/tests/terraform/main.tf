@@ -2,6 +2,7 @@ resource "oci_core_instance" "freshrss" {
   availability_domain                 = var.availability_domain
   compartment_id                      = var.terraform_tenancy_ocid
   defined_tags                        = local.defined_tags
+  display_name                        = "packer-test-freshrss"
   is_pv_encryption_in_transit_enabled = true
   shape                               = var.instance_shape
 
@@ -17,6 +18,11 @@ resource "oci_core_instance" "freshrss" {
   launch_options {
     network_type                        = "PARAVIRTUALIZED"
     is_pv_encryption_in_transit_enabled = true
+  }
+
+  shape_config {
+    ocpus         = 1
+    memory_in_gbs = 6
   }
 
   source_details {

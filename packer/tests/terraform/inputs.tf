@@ -16,8 +16,8 @@ variable "ingress_ports" {
 
 variable "instance_shape" {
   type        = string
-  default     = "VM.Standard.E2.1.Micro"
-  description = "Instance type to use, default is the always free domain x86 option."
+  default     = "VM.Standard.A1.Flex"
+  description = "Instance type to use, default is the always free domain ARM option."
 }
 
 variable "oci_fingerprint" {
