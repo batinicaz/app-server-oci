@@ -102,7 +102,9 @@ runs:
                 else
                     if [ "$(echo "$IMAGES_TO_DELETE" | jq -r 'if type=="array" then .[] else . end | .id')" != "null" ]; then
                         for IMAGE_ID in $(echo "$IMAGES_TO_DELETE" | jq -r 'if type=="array" then .[] else . end | .id'); do
+                            echo "Deleting the image: ${IMAGE_ID}"
                             oci compute image delete --image-id ${IMAGE_ID} --force
+                            echo "Image deleted"
                         done
                     fi
                 fi
