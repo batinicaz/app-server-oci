@@ -22,7 +22,8 @@ Along with the following config tweaks:
 - :broom: Log rotate configured for all services
 - :no_bell: MOTD advertisements/spam removed
 - :toolbox: OCI CLI added
-- :no_good: Snap and Ubuntu Advantage removed
+- :bar_chart: Oracle cloud agent added
+- :no_good: Ubuntu Advantage removed
 - :detective: Telemetry packages removed and telemetry domains blocked
 
 ## Deployment
