@@ -20,7 +20,7 @@
 
 - name: Remove SSH
   ansible.builtin.apt:
-    name: "openssh-*"
+    name: "openssh-server"
     state: absent
   when: local_dev is not defined
 
