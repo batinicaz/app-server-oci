@@ -39,6 +39,10 @@
     group: www-data
     mode: '700'
 
+- name: Set port number to use
+  ansible.builtin.set_fact:
+    fulltext_rss_port: "{{ 5000 + range(0, 4999) | random }}"
+
 - name: Create compose file
   ansible.builtin.template:
     src: docker-compose.yml.j2
@@ -46,6 +50,19 @@
     owner: root
     group: root
     mode: '0700'
+
+- name: Create Nginx config file
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/fulltextrss.conf
+    mode: '0644'
+    owner: www-data
+    group: www-data
+
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
 
 - name: Fetch latest docker image
   ansible.builtin.command: docker compose pull

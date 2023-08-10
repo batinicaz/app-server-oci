@@ -8,4 +8,4 @@ services:
       - ./{{ fulltext_rss_config_dir }}:/var/www/html/site_config/standard
       - ./{{ fulltext_rss_config_file }}:/var/www/html/{{ fulltext_rss_config_file }}
     ports:
-      - 3000:80
+      - {{ fulltext_rss_port }}:80

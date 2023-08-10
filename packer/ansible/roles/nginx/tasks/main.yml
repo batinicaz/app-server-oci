@@ -13,10 +13,33 @@
   ansible.builtin.apt:
     name: nginx
 
-- name: Remove default site
+- name: Remove default site config
   ansible.builtin.file:
     path: /etc/nginx/conf.d/default.conf
     state: absent
+
+- name: Remove default site
+  ansible.builtin.file:
+    path: "/usr/share/nginx/html/{{ item }}"
+    state: absent
+  loop:
+    - "50x.html"
+    - "index.html"
+
+- name: Create robots.txt
+  ansible.builtin.copy:
+    src: robots.txt
+    dest: /usr/share/nginx/html/robots.txt
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  register: robots_txt
+
+- name: Create no-index.conf
+  ansible.builtin.template:
+    src: "no-index.conf.j2"
+    dest: "{{ nginx_no_index_conf }}"
+    mode: '0600'
 
 - name: Add nginx user to www-data group
   ansible.builtin.user:
