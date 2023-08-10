@@ -19,8 +19,8 @@
   ansible.builtin.template:
     src: custom_config.php.j2
     dest: "{{ fulltext_rss_install_dir }}/{{ fulltext_rss_config_file }}"
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
     mode: '0700'
 
 - name: Fetch latest version of site configurations
@@ -35,8 +35,8 @@
     path: "{{ fulltext_rss_install_dir }}/{{ fulltext_rss_config_dir }}"
     state: directory
     recurse: true
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
     mode: '700'
 
 - name: Set port number to use
@@ -56,8 +56,8 @@
     src: nginx.conf.j2
     dest: /etc/nginx/conf.d/fulltextrss.conf
     mode: '0644'
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
 
 - name: Restart nginx
   ansible.builtin.systemd:

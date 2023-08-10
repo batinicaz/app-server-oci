@@ -22,8 +22,8 @@
     src: "{{ repo_path }}/{{ extension.directory }}"
     dest: "{{ freshrss_install_dir }}/extensions/"
     remote_src: true
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
     mode: '0755'
   when: extension.source.endswith('.git')
 
@@ -31,8 +31,8 @@
   ansible.builtin.unarchive:
     src: "{{ extension.source }}"
     dest: "{{ freshrss_install_dir }}/extensions"
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
     mode: '0755'
     remote_src: true
 

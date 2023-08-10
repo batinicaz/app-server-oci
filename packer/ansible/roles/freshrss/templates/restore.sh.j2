@@ -3,8 +3,15 @@
 backup_dir="{{ backup_dir }}"
 mysql_user="root"
 mysql_password="{{ mysql.root }}"
+install_dir_owner="{{ nginx_user }}"
+install_dir_group="{{ nginx_group }}"
 file_restore_dir="{{ freshrss_install_dir }}"
 script_name=$(basename "$0")
+
+update_permissions_and_owner() {
+  chmod -R 0755 "$file_restore_dir"
+  chown -R "install_dir_owner":"install_dir_group" "$file_restore_dir"
+}
 
 get_most_recent_backup() {
   type=$1
@@ -28,30 +35,6 @@ get_most_recent_file_backup() {
   echo "$most_recent_backup"
 }
 
-# Restore the oldest MySQL backup
-restore_oldest_mysql_backup() {
-    oldest_backup="$1"
-    if [ -n "$oldest_backup" ]; then
-        echo "Restoring MySQL backup file: $oldest_backup"
-        mysql -u "$mysql_user" -p"$mysql_password" < "$oldest_backup"
-    else
-        echo "No MySQL backups found."
-        exit 1
-    fi
-}
-
-# Restore the oldest file backup
-restore_oldest_file_backup() {
-    oldest_backup="$1"
-    if [ -n "$oldest_backup" ]; then
-        echo "Restoring user config backup: $oldest_backup"
-        tar -xzf "$oldest_backup" -C "$file_restore_dir" --overwrite
-    else
-        echo "No file backups found."
-        exit 1
-    fi
-}
-
 restore_mysql_backup() {
   backup_file="$1"
   if [ -f "$backup_file" ]; then
@@ -68,13 +51,13 @@ restore_file_backup() {
   if [ -f "$backup_file" ]; then
     echo "Restoring user config backup: $backup_file"
     tar -xzf "$backup_file" -C "$file_restore_dir" --overwrite
+    update_permissions_and_owner
   else
     echo "File backup not found: $backup_file"
     exit 1
   fi
 }
 
-# Find the closest MySQL backup in age to the requested time frame
 find_closest_backup() {
   n="$1"
   unit="$2"
@@ -153,7 +136,6 @@ restore_closest_file_backup() {
   fi
 }
 
-# Restore a backup from N days/weeks ago
 restore_backup_from_n() {
   n="$1"
   unit="$2"
