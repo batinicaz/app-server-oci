@@ -8,7 +8,7 @@
   compress
   delaycompress
   notifempty
-  create 0644 {{ item.user | default('www-data') }} {{ item.group | default('www-data') }}
+  create 0644 {{ item.user | default(nginx_user) }} {{ item.group | default(nginx_group) }}
   sharedscripts
   postrotate
     /bin/systemctl restart {{ item.name }} > /dev/null

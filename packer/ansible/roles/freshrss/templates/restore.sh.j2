@@ -3,8 +3,8 @@
 backup_dir="{{ backup_dir }}"
 mysql_user="root"
 mysql_password="{{ mysql.root }}"
-install_dir_owner="www-data"
-install_dir_group="www-datag"
+install_dir_owner="{{ nginx_user }}"
+install_dir_group="{{ nginx_group }}"
 file_restore_dir="{{ freshrss_install_dir }}"
 script_name=$(basename "$0")
 

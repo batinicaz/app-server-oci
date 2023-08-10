@@ -42,8 +42,8 @@
     path: "{{ freshrss_install_dir }}"
     state: directory
     recurse: true
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
     mode: '0755'
 
 - name: Cleanup downloaded archive
@@ -53,13 +53,13 @@
 
 - name: Perform first time setup
   ansible.builtin.command:
-    cmd: "sudo -u www-data ./cli/do-install.php --default_user {{ freshrss.user }} --auth_type form --environment production --language en --title FreshRSS --api_enabled --db-type mysql --db-host localhost:3306 --db-user freshrss --db-password {{ mysql.freshrss }} --db-base freshrss --disable_update"
+    cmd: "sudo -u {{ nginx_user }} ./cli/do-install.php --default_user {{ freshrss.user }} --auth_type form --environment production --language en --title FreshRSS --api_enabled --db-type mysql --db-host localhost:3306 --db-user freshrss --db-password {{ mysql.freshrss }} --db-base freshrss --disable_update"
     chdir: "{{ freshrss_install_dir }}"
     creates: /opt/freshrss/data/applied_migrations.txt
 
 - name: Create user
   ansible.builtin.command:
-    cmd: "sudo -u www-data ./cli/create-user.php --user {{ freshrss.user }} --password '{{ freshrss.password }}' --language en --no_default_feeds"
+    cmd: "sudo -u {{ nginx_user }} ./cli/create-user.php --user {{ freshrss.user }} --password '{{ freshrss.password }}' --language en --no_default_feeds"
     chdir: "{{ freshrss_install_dir }}"
   register: command_output
   changed_when: "'FreshRSS warning: username already exists' not in command_output.stderr"
@@ -69,9 +69,9 @@
   ansible.builtin.file:
     path: "/var/log/freshrss-feed-update.log"
     state: touch
-    group: 'www-data'
+    group: "{{ nginx_group }}"
     mode: '0644'
-    owner: 'www-data'
+    owner: "{{ nginx_user }}"
   register: freshrss_feed_update_log
 
 - name: Setup cronjob to auto refresh feeds
@@ -80,7 +80,7 @@
     weekday: "*"
     hour: "*"
     minute: "*/20"
-    user: www-data
+    user: "{{ nginx_user }}"
     job: "php -f {{ freshrss_install_dir }}/app/actualize_script.php > {{ freshrss_feed_update_log.dest }} 2>&1 && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/b04fc65e-865e-4b96-99ff-708e243fa20c"
 
 - name: Install extensions
@@ -94,8 +94,8 @@
     src: nginx.conf.j2
     dest: /etc/nginx/conf.d/freshrss.conf
     mode: '0644'
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
 
 - name: Restart nginx
   ansible.builtin.systemd:
