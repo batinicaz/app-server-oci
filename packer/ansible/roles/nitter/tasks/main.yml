@@ -29,20 +29,19 @@
 
 - name: Create nitter directory
   ansible.builtin.file:
-    path: "/opt/nitter"
+    path: "{{ nitter_install_dir }}"
     state: directory
     mode: '0700'
     owner: "{{ nitter_user.name }}"
     group: "{{ nitter_user.group }}"
-  register: nitter_install_dir
 
 - name: Download and extract latest release
   ansible.builtin.unarchive:
     # Grab the ARM release if building locally
     src: "{{ latest_nitter_release.json.assets[use_arm | ternary(1, 0)].browser_download_url }}"
-    dest: "/opt/nitter"
+    dest: "{{ nitter_install_dir }}"
     remote_src: true
-    creates: "/opt/nitter/nitter"
+    creates: "{{ nitter_install_dir }}/nitter"
     owner: "{{ nitter_user.name }}"
     group: "{{ nitter_user.group }}"
     mode: '0755'
@@ -52,10 +51,16 @@
   changed_when: true
   register: salt
 
+- name: Set port number to use
+  ansible.builtin.set_fact:
+    nitter_port: "{{ 5000 + range(0, 4999) | random }}"
+  until: fulltext_rss_port != nitter_port
+  retries: 100
+
 - name: Set up Nitter configuration
   ansible.builtin.template:
     src: "nitter.conf.j2"
-    dest: "/opt/nitter/nitter.conf"
+    dest: "{{ nitter_install_dir }}/nitter.conf"
     owner: "{{ nitter_user.name }}"
     group: "{{ nitter_user.group }}"
     mode: '0644'
@@ -65,9 +70,24 @@
     src: "nitter.service.j2"
     dest: "/etc/systemd/system/nitter.service"
     mode: '0600'
+    owner: www-data
+    group: www-data
 
 - name: Enable and start Nitter
   ansible.builtin.systemd:
     name: nitter
     enabled: true
     state: started
+
+- name: Create Nginx config file
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/nitter.conf
+    mode: '0644'
+    owner: www-data
+    group: www-data
+
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted

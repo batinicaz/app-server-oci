@@ -17,6 +17,7 @@ include <tunables/global>
   /opt/freshrss/** r,
   /run/php/php8.1-fpm.sock rw,
   /usr/sbin/nginx r,
+  /usr/share/nginx/html/* r,
   /var/log/nginx/** rw,
   /var/run/nginx.pid w,
   owner /run/nginx.pid rw,

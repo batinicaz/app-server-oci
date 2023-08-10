@@ -12,6 +12,8 @@ server {
 
 	server_tokens off;
 
+	include {{ nginx_no_index_conf }};
+
 	location ~ ^.+?\.php(/.*)?$ {
         # Mitigate https://httpoxy.org/ vulnerabilities
         fastcgi_param HTTP_PROXY "";

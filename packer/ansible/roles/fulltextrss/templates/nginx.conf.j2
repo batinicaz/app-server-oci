@@ -1,0 +1,33 @@
+upstream fulltextrss {
+    server 127.0.0.1:{{ fulltext_rss_port }};
+}
+
+server {
+    listen 3000;
+
+    server_name fulltextrss;
+
+    root {{ fulltext_rss_install_dir }}/;
+
+    access_log /var/log/nginx/fulltextrss.access.log;
+    error_log /var/log/nginx/fulltextrss.error.log crit;
+
+    gzip on;
+    gzip_comp_level 6;
+    gzip_vary on;
+    gzip_min_length  1000;
+    gzip_proxied any;
+    gzip_types application/rss+xml;
+
+    server_tokens off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    include {{ nginx_no_index_conf }};
+
+    location / {
+        proxy_pass http://fulltextrss;
+    }
+}

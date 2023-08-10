@@ -1,4 +1,2 @@
 use_arm: true
-nitter_repo: "https://github.com/zedeus/nitter.git"
-nitter_dir: "/opt/nitter"
-nim_version: "1.6.14"
+nitter_install_dir: "/opt/nitter"

@@ -9,8 +9,8 @@ Type=simple
 User={{ nitter_user.name }}
 Group={{ nitter_user.group }}
 
-ExecStart={{ nitter_dir }}/nitter
-WorkingDirectory={{ nitter_dir }}
+ExecStart={{ nitter_install_dir }}/nitter
+WorkingDirectory={{ nitter_install_dir }}
 
 StandardOutput=file:/var/log/nitter.log
 StandardError=file:/var/log/nitter.log
