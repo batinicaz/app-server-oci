@@ -31,3 +31,16 @@ Along with the following config tweaks:
 ## Deployment
 
 Deployed via Terraform, see: [batinicaz/freshrss](https://github.com/batinicaz/freshrss)
+
+### Nitter Guest Accounts
+
+Nitter requires guest accounts due to Twitters recent API changes.
+
+Until a service is integrated into the main nitter codebase to generate these (WIP see [#zedeus/nitter#983](https://github.com/zedeus/nitter/issues/983))
+
+You can generate guest accounts using: https://gitlab.com/yawning/twitter-guest-account like so:
+
+```bash
+go run main.go -fetch-bearer-token -num-accounts 3
+ansible-vault encrypt guest_accounts.json --output=guest_accounts.json.encrypted
+```
