@@ -65,6 +65,15 @@
     group: "{{ nitter_user.group }}"
     mode: '0644'
 
+- name: Add guest accounts to Nitter
+  ansible.builtin.copy:
+    src: guest_accounts.json.encrypted
+    dest: "{{ nitter_install_dir }}/guest_accounts.json"
+    decrypt: true
+    owner: "{{ nitter_user.name }}"
+    group: "{{ nitter_user.group }}"
+    mode: '0644'
+
 - name: Set up Nitter service
   ansible.builtin.template:
     src: "nitter.service.j2"
