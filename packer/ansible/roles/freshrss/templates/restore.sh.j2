@@ -10,7 +10,7 @@ script_name=$(basename "$0")
 
 update_permissions_and_owner() {
   chmod -R 0755 "$file_restore_dir"
-  chown -R "install_dir_owner":"install_dir_group" "$file_restore_dir"
+  chown -R "$install_dir_owner":"$install_dir_group" "$file_restore_dir"
 }
 
 get_most_recent_backup() {
