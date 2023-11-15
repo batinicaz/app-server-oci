@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/ansible/ansible-lint
-    rev: v6.17.2
+    rev: v6.22.0
     hooks:
       - id: ansible-lint
 
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.22
+    rev: v0.1.23
     hooks:
       - id: packer-validate
       - id: terraform-fmt
@@ -13,6 +13,7 @@ repos:
       - id: terraform-validate
 
   - repo: https://github.com/bridgecrewio/checkov.git
-    rev: 2.3.324
+    rev: 3.0.37
     hooks:
       - id: checkov
+        additional_dependencies: ['aiohttp==3.9.0rc0'] # Temp workaround for python 3.12 - https://github.com/aio-libs/aiohttp/issues/7739
