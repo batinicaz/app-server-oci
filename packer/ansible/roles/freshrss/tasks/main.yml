@@ -85,7 +85,7 @@
 
 - name: Install extensions
   ansible.builtin.include_tasks: extensions.yml
-  loop: "{{ extensions }}"
+  loop: "{{ freshrss_extensions }}"
   loop_control:
     loop_var: extension
 

@@ -1,4 +1,4 @@
-iptables_rules:
+security_iptables_rules:
   # Custom rules
   # Allow established connections
   - chain: "INPUT"
