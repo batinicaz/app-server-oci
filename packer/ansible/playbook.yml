@@ -24,7 +24,7 @@
     - role: nitter
     - role: logrotate
       vars:
-        services:
+        logrotate_services:
           - name: freshrss
             logs:
               - "{{ freshrss_feed_update_log.dest }}"

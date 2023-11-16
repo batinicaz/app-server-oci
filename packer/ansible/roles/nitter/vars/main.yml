@@ -1,2 +1,2 @@
-use_arm: true
+nitter_use_arm: true
 nitter_install_dir: "/opt/nitter"

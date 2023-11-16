@@ -27,7 +27,7 @@
   ansible.builtin.lineinfile:
     path: /etc/hosts
     line: "127.0.0.1 {{ item }}"
-  loop: "{{ telemetry_domains + telemetry_domains | map('regex_replace', '^', 'www.') | list }}"
+  loop: "{{ setup_telemetry_domains + telemetry_domains | map('regex_replace', '^', 'www.') | list }}"
 
 - name: Remove MOTD noise
   ansible.builtin.file:
@@ -61,4 +61,4 @@
 - name: Configure rsyslog to redirect cron logs
   ansible.builtin.lineinfile:
     path: "/etc/rsyslog.d/50-default.conf"
-    line: "cron.*    {{ cron_log }}"
+    line: "cron.*    {{ setup_cron_log }}"

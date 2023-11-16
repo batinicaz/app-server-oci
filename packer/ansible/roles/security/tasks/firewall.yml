@@ -51,7 +51,7 @@
     match: "{{ item.match | default(omit) }}"
     reject_with: "{{ item.reject_with | default(omit) }}"
     uid_owner: "{{ item.uid_owner | default(omit) }}"
-  loop: "{{ iptables_rules }}"
+  loop: "{{ security_iptables_rules }}"
 
 - name: Remove rules associated with the default InstanceServices chain
   ansible.builtin.iptables:

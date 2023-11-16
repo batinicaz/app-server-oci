@@ -10,7 +10,7 @@
     owner: root
     group: root
     mode: '0644'
-  loop: "{{ services }}"
+  loop: "{{ logrotate_services }}"
 
 - name: Restart logrotate
   ansible.builtin.systemd:

@@ -1,4 +1,4 @@
-cron_log: "/var/log/cron.log"
-telemetry_domains:
+setup_cron_log: "/var/log/cron.log"
+setup_telemetry_domains:
   - metrics.ubuntu.com
   - popcon.ubuntu.com
