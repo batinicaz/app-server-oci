@@ -1,5 +1,5 @@
 upstream fulltextrss {
-    server 127.0.0.1:{{ fulltext_rss_port }};
+    server 127.0.0.1:{{ fulltextrss_port }};
 }
 
 server {
@@ -7,7 +7,7 @@ server {
 
     server_name fulltextrss;
 
-    root {{ fulltext_rss_install_dir }}/;
+    root {{ fulltextrss_install_dir }}/;
 
     access_log /var/log/nginx/fulltextrss.access.log;
     error_log /var/log/nginx/fulltextrss.error.log crit;
