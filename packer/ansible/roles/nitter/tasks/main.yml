@@ -54,7 +54,7 @@
 - name: Set port number to use
   ansible.builtin.set_fact:
     nitter_port: "{{ 5000 + range(0, 4999) | random }}"
-  until: fulltext_rss_port != nitter_port
+  until: fulltextrss_port != nitter_port
   retries: 100
 
 - name: Set up Nitter configuration

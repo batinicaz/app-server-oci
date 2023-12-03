@@ -78,7 +78,7 @@ runs:
       run: >
         docker run --rm -v "$(pwd):/work" -w /work
         ghcr.io/batinicaz/packer:latest sh -c
-        'echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
+        'set -e && echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
         go test -timeout 1h -v ./packer/tests ${{ env.DELETE_FLAG }}
         -hcpBucketName ${{ env.BUCKET_NAME }}
         -fingerprint "${{ inputs.fingerprint }}"
