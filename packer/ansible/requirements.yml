@@ -6,4 +6,4 @@ roles:
   - name: geerlingguy.docker
     version: 6.1.0
   - name: geerlingguy.mysql
-    version: 4.3.3
+    version: 4.3.4
