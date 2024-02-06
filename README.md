@@ -163,4 +163,4 @@ print(authentication)
 }
 ```
 
-This then enables you to use nitter on the guest_accounts branch provided the 30 day expiry is disabled ().
+This then enables you to use Nitter on the guest_accounts branch provided the 30 day expiry is disabled (https://github.com/batinicaz/nitter/commit/acc2b906668e5dd405a3a1453250c3a873db7220).
