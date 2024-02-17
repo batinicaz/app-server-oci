@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/ansible/ansible-lint
-    rev: v6.22.1
+    rev: v6.22.2
     hooks:
       - id: ansible-lint
 
@@ -13,6 +13,6 @@ repos:
       - id: terraform-validate
 
   - repo: https://github.com/bridgecrewio/checkov.git
-    rev: 3.1.20
+    rev: 3.2.21
     hooks:
       - id: checkov
