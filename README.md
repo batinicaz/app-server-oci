@@ -9,6 +9,7 @@ Includes the following applications:
 - :newspaper_roll: [FreshRSS](https://github.com/FreshRSS/FreshRSS) for feed reading
 - :mag_right: [FullTextRSS](https://github.com/heussd/fivefilters-full-text-rss-docker/tree/master) for converting partial feeds into full feeds for use in FreshRSS
 - :bird: [Nitter](https://github.com/zedeus/nitter) for providing RSS feeds for Twitter
+- :alien: [Redlib](https://github.com/redlib-org/redlib) for browsing Reddit
 - :globe_with_meridians: Nginx to serve FreshRSS and reverse proxy to FullTextRSS and Nitter
 - :closed_lock_with_key: [Tailscale](https://github.com/tailscale/tailscale) for management (SSH removed)
 

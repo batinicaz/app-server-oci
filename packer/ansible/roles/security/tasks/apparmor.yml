@@ -20,6 +20,9 @@
     - name: Nitter
       src: opt.nitter.nitter
       dest: opt.nitter.nitter
+    - name: Redlib
+      src: opt.redlib.redlib
+      dest: opt.redlib.redlib
     - name: PHP
       src: usr.sbin.phpfpm
       dest: usr.sbin.phpfpm

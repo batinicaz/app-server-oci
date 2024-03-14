@@ -22,6 +22,7 @@
     - role: freshrss
     - role: fulltextrss
     - role: nitter
+    - role: redlib
     - role: logrotate
       vars:
         logrotate_services:
@@ -32,7 +33,19 @@
               - "{{ freshrss_install_dir }}/data/users/{{ freshrss.user }}/log.txt"
               - /var/log/nginx/freshrss.access.log
               - /var/log/nginx/freshrss.error.log
+          - name: fulltextrss
+            logs:
+              - /var/log/nginx/fulltextrss.access.log
+              - /var/log/nginx/fulltextrss.error.log
           - name: nginx
             logs:
               - /var/log/nginx/error.log
+          - name: nitter
+            logs:
+              - /var/log/nginx/nitter.access.log
+              - /var/log/nginx/nitter.error.log
+          - name: redlib
+            logs:
+              - /var/log/nginx/redlib.access.log
+              - /var/log/nginx/redlib.error.log
     - role: cleanup

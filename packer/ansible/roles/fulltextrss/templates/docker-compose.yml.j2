@@ -4,7 +4,7 @@ services:
     image: {{ fulltextrss_image }}
     restart: always
     volumes:
-      - ./cache:/var/www/html/cache
+      - ./cache:/var/www/html/cache/rss
       - ./{{ fulltextrss_config_dir }}:/var/www/html/site_config/standard
       - ./{{ fulltextrss_config_file }}:/var/www/html/{{ fulltextrss_config_file }}
     ports:
