@@ -1,0 +1,3 @@
+redlib_build_dir: /tmp/redlib
+redlib_install_dir: /opt/redlib
+redlib_version: v0.31.0 # Pinned as project not yet building binaries for all releases

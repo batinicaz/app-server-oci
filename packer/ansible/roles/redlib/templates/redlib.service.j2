@@ -1,0 +1,36 @@
+[Unit]
+Description=redlib daemon
+Before=nginx.service
+After=network.service
+
+[Service]
+DynamicUser=yes
+Environment=ADDRESS=0.0.0.0
+Environment=PORT={{ redlib_port }}
+EnvironmentFile=-{{ redlib_install_dir }}/redlib.conf
+ExecStart={{ redlib_install_dir }}/redlib -a ${ADDRESS} -p ${PORT}
+
+# Hardening
+DeviceAllow=
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateDevices=yes
+ProcSubset=pid
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=invisible
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service ~@privileged ~@resources
+UMask=0077
+
+[Install]
+WantedBy=default.target

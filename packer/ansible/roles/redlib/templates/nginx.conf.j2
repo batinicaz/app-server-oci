@@ -1,0 +1,27 @@
+upstream redlib {
+    server 127.0.0.1:{{ redlib_port }};
+}
+
+server {
+    listen 8081;
+
+    server_name redlib;
+
+    root {{ redlib_install_dir }}/;
+
+    access_log /var/log/nginx/redlib.access.log;
+    error_log /var/log/nginx/redlib.error.log crit;
+
+    server_tokens off;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    include {{ nginx_no_index_conf }};
+
+    location / {
+        proxy_pass http://redlib;
+    }
+}

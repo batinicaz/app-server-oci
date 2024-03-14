@@ -1,0 +1,17 @@
+include <tunables/global>
+
+/opt/redlib/redlib {
+  include <abstractions/base>
+  include <abstractions/nameservice>
+  include <abstractions/ssl_certs>
+
+  /etc/host.conf r,
+  /etc/hosts r,
+  /etc/nsswitch.conf r,
+  /opt/redlib/redlib mr,
+  /run/systemd/resolve/stub-resolv.conf r,
+  owner /proc/*/cgroup r,
+  owner /proc/*/mountinfo r,
+  owner /proc/*/stat r,
+
+}

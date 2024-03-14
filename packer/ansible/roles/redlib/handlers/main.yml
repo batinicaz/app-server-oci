@@ -1,0 +1,4 @@
+- name: Remove rust
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.cargo/bin/rustup self uninstall -y"
+  listen: "remove rust"
+  changed_when: true
