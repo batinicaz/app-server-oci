@@ -24,6 +24,15 @@
     user: root
     job: "mysqldump --skip-comments --user=root --password='{{ mysql.root }}' --all-databases > \"{{ freshrss_backup_dir }}/$(date +'\\%Y-\\%m-\\%d_\\%H-\\%M-\\%S').sql\" && curl -fsS -m 10 --retry 5 -o /dev/null 'https://hc-ping.com/f0aadcfa-027e-40f7-a672-f5a59895ecc5'"
 
+- name: Setup cleanup job (every day at 00:01 AM)
+  ansible.builtin.cron:
+    name: Cleanup backups
+    job: "cd /backups && for file in *; do [ \"$(echo $file | cut -d'_' -f1)\" \\< \"$(date -d \"3 days ago\" +\\%Y-\\%m-\\%d)\" ] && rm \"$file\"; done"
+    weekday: "*"
+    hour: "0"
+    minute: "01"
+    user: root
+
 - name: Create restore tool
   ansible.builtin.template:
     src: restore.sh.j2
