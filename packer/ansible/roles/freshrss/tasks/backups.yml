@@ -27,7 +27,7 @@
 - name: Setup cleanup job (every day at 00:01 AM)
   ansible.builtin.cron:
     name: Cleanup backups
-    job: "cd /backups && for file in *; do [ \"$(echo $file | cut -d'_' -f1)\" \\< \"$(date -d \"3 days ago\" +\\%Y-\\%m-\\%d)\" ] && rm \"$file\"; done && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/75cab855-7140-46b1-bf6a-16ff02be913c"
+    job: "cd /backups && for file in *; do [ \"$(echo $file | cut -d'_' -f1)\" \\< \"$(date -d \"3 days ago\" +\\%Y-\\%m-\\%d)\" ] && rm \"$file\" && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/75cab855-7140-46b1-bf6a-16ff02be913c\"; done"
     weekday: "*"
     hour: "0"
     minute: "01"
