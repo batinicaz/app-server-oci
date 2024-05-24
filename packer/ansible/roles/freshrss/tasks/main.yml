@@ -56,11 +56,13 @@
     cmd: "sudo -u {{ nginx_user }} ./cli/do-install.php --default_user {{ freshrss.user }} --auth_type form --environment production --language en --title FreshRSS --api_enabled --db-type mysql --db-host localhost:3306 --db-user freshrss --db-password {{ mysql.freshrss }} --db-base freshrss --disable_update"
     chdir: "{{ freshrss_install_dir }}"
     creates: /opt/freshrss/data/applied_migrations.txt
+  no_log: true
 
 - name: Create user
   ansible.builtin.command:
-    cmd: "sudo -u {{ nginx_user }} ./cli/create-user.php --user {{ freshrss.user }} --password '{{ freshrss.password }}' --language en --no_default_feeds"
+    cmd: "sudo -u {{ nginx_user }} ./cli/create-user.php --user {{ freshrss.user }} --password '{{ freshrss.password }}' --language en"
     chdir: "{{ freshrss_install_dir }}"
+  no_log: true
   register: command_output
   changed_when: "'FreshRSS warning: username already exists' not in command_output.stderr"
   failed_when: "command_output.rc != 0 and 'FreshRSS warning: username already exists' not in command_output.stderr"
