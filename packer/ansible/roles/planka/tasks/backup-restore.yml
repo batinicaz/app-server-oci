@@ -1,0 +1,35 @@
+- name: Create backups directory
+  ansible.builtin.file:
+    path: "{{ planka_install_dir }}/backups"
+    state: directory
+    mode: '0700'
+
+- name: Download backup script
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/plankanban/planka/master/docker-backup.sh"
+    dest: "{{ planka_install_dir }}/docker-backup.sh"
+    mode: '0711'
+
+- name: Download restore script
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/plankanban/planka/master/docker-restore.sh"
+    dest: "{{ planka_install_dir }}/docker-restore.sh"
+    mode: '0711'
+
+- name: Setup DB backup cronjob (every day at 1AM)
+  ansible.builtin.cron:
+    name: Planka Backup
+    weekday: "*"
+    hour: "1"
+    minute: "0"
+    user: root
+    job: "cd {{ planka_install_dir }}/backups && bash /opt/planka/backup/backup.sh && curl -fsS -m 10 --retry 5 -o /dev/null 'https://hc-ping.com/7ee5474d-e6d4-4fa0-80c2-752723605753'"
+
+- name: Setup cleanup job (every day at 00:01 AM)
+  ansible.builtin.cron:
+    name: Cleanup Planka backups
+    job: "cd {{ planka_install_dir }}/backups && for file in *; do [ \"$(echo $file | cut -d'T' -f1)\" \\< \"$(date --utc -d \"3 days ago\" +\\%Y-\\%m-\\%d)\" ] && rm \"$file\" && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/06581f5b-f57b-4830-9eaf-0da9a1d7e6ed; done"
+    weekday: "*"
+    hour: "0"
+    minute: "01"
+    user: root
