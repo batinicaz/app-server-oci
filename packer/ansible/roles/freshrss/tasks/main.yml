@@ -53,19 +53,18 @@
 
 - name: Perform first time setup
   ansible.builtin.command:
-    cmd: "sudo -u {{ nginx_user }} ./cli/do-install.php --default_user {{ freshrss.user }} --auth_type form --environment production --language en --title FreshRSS --api_enabled --db-type mysql --db-host localhost:3306 --db-user freshrss --db-password {{ mysql.freshrss }} --db-base freshrss --disable_update"
+    cmd: "sudo -u {{ nginx_user }} ./cli/do-install.php --default_user {{ freshrss.user }} --auth-type http_auth --environment production --language en --title FreshRSS --api-enabled --db-type mysql --db-host localhost:3306 --db-user freshrss --db-password {{ mysql.freshrss }} --db-base freshrss --disable-update"
     chdir: "{{ freshrss_install_dir }}"
     creates: /opt/freshrss/data/applied_migrations.txt
   no_log: true
 
-- name: Create user
-  ansible.builtin.command:
-    cmd: "sudo -u {{ nginx_user }} ./cli/create-user.php --user {{ freshrss.user }} --password '{{ freshrss.password }}' --language en"
-    chdir: "{{ freshrss_install_dir }}"
-  no_log: true
-  register: command_output
-  changed_when: "'FreshRSS warning: username already exists' not in command_output.stderr"
-  failed_when: "command_output.rc != 0 and 'FreshRSS warning: username already exists' not in command_output.stderr"
+- name: Create OIDC authentication script
+  ansible.builtin.template:
+    src: "oidc.lua.j2"
+    dest: "{{ nginx_conf_directory }}/freshrss-oidc.lua"
+    mode: '0600'
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
 
 - name: Create log file for tracking auto refresh of feeds
   ansible.builtin.file:

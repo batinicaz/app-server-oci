@@ -66,6 +66,11 @@
     owner: "{{ nginx_user }}"
     group: "{{ nginx_group }}"
 
+- name: Install OIDC support
+  ansible.builtin.command: opm get zmartzone/lua-resty-openidc
+  args:
+    creates: /usr/local/openresty/site/lualib/resty/openidc.lua
+
 - name: Start and enable Openresty service
   ansible.builtin.systemd:
     name: openresty

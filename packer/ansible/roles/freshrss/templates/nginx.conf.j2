@@ -30,6 +30,11 @@ server {
 	}
 
 	location / {
+		access_by_lua_file {{ nginx_conf_directory }}/freshrss-oidc.lua;
 		try_files $uri $uri/ index.php;
+	}
+
+	location /i/oidc {
+		access_by_lua_file {{ nginx_conf_directory }}/freshrss-oidc.lua;
 	}
 }
