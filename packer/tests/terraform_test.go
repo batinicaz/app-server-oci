@@ -21,6 +21,7 @@ const (
 var (
 	ingressTypes = map[string]string{
 		"80":   "http",
+		"1337": "http",
 		"3000": "http",
 		"8080": "http",
 		"8081": "http",
