@@ -7,10 +7,11 @@ server {
 
 	index index.php index.html index.htm;
 
-	access_log /var/log/nginx/freshrss.access.log;
-	error_log /var/log/nginx/freshrss.error.log crit;
+	access_log {{ nginx_logs_directory }}/freshrss.access.log;
+	error_log {{ nginx_logs_directory }}/freshrss.error.log crit;
 
 	server_tokens off;
+	more_clear_headers Server;
 
 	include {{ nginx_no_index_conf }};
 

@@ -36,25 +36,25 @@
               - "{{ freshrss_feed_update_log.dest }}"
               - "{{ freshrss_install_dir }}/data/users/_/log.txt"
               - "{{ freshrss_install_dir }}/data/users/{{ freshrss.user }}/log.txt"
-              - /var/log/nginx/freshrss.access.log
-              - /var/log/nginx/freshrss.error.log
+              - "{{ nginx_logs_directory }}/freshrss.access.log"
+              - "{{ nginx_logs_directory }}/freshrss.error.log"
           - name: fulltextrss
             logs:
-              - /var/log/nginx/fulltextrss.access.log
-              - /var/log/nginx/fulltextrss.error.log
+              - "{{ nginx_logs_directory }}/fulltextrss.access.log"
+              - "{{ nginx_logs_directory }}/fulltextrss.error.log"
           - name: nginx
             logs:
-              - /var/log/nginx/error.log
+              - "{{ nginx_logs_directory }}/error.log"
           - name: nitter
             logs:
-              - /var/log/nginx/nitter.access.log
-              - /var/log/nginx/nitter.error.log
+              - "{{ nginx_logs_directory }}/nitter.access.log"
+              - "{{ nginx_logs_directory }}/nitter.error.log"
           - name: redlib
             logs:
-              - /var/log/nginx/redlib.access.log
-              - /var/log/nginx/redlib.error.log
+              - "{{ nginx_logs_directory }}/redlib.access.log"
+              - "{{ nginx_logs_directory }}/redlib.error.log"
           - name: planka
             logs:
-              - /var/log/nginx/planka.access.log
-              - /var/log/nginx/planka.error.log
+              - "{{ nginx_logs_directory }}/planka.access.log"
+              - "{{ nginx_logs_directory }}/planka.error.log"
     - role: cleanup

@@ -9,10 +9,11 @@ server {
 
     root {{ redlib_install_dir }}/;
 
-    access_log /var/log/nginx/redlib.access.log;
-    error_log /var/log/nginx/redlib.error.log crit;
+    access_log {{ nginx_logs_directory }}/redlib.access.log;
+    error_log {{ nginx_logs_directory }}/redlib.error.log crit;
 
     server_tokens off;
+    more_clear_headers Server;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;

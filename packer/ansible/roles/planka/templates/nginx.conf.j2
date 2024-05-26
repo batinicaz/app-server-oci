@@ -9,8 +9,11 @@ server {
 
     root {{ planka_install_dir }}/;
 
-    access_log /var/log/nginx/planka.access.log;
-    error_log /var/log/nginx/planka.error.log crit;
+    access_log {{ nginx_logs_directory }}/planka.access.log;
+    error_log {{ nginx_logs_directory }}/planka.error.log crit;
+    
+    server_tokens off;
+    more_clear_headers Server;
 
     location ~* \.io {
         proxy_set_header Upgrade $http_upgrade;

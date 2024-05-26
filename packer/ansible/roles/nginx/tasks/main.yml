@@ -1,26 +1,41 @@
-- name: Add Nginx apt signing key
+- name: Add Openresty apt signing key
   ansible.builtin.apt_key:
-    keyserver: https://nginx.org/keys/nginx_signing.key
-    keyring: /etc/apt/trusted.gpg.d/nginx.gpg
-    id: 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
+    keyserver: https://openresty.org/package/pubkey.gpg
+    keyring: /etc/apt/trusted.gpg.d/openresty.gpg
+    id: E52218E7087897DC6DEA6D6D97DB7443D5EDEB74
 
-- name: Add Nginx repo
+- name: Add Openresty repo
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/trusted.gpg.d/nginx.gpg] http://nginx.org/packages/ubuntu {{ ansible_distribution_release }} nginx"
-    filename: nginx
+    repo: "deb [arch=arm64 signed-by=/etc/apt/trusted.gpg.d/openresty.gpg] http://openresty.org/package/arm64/ubuntu {{ ansible_distribution_release }} main"
+    filename: openresty
 
-- name: Install nginx
+- name: Install Openresty
   ansible.builtin.apt:
-    name: nginx
+    name: openresty
 
-- name: Remove default site config
+- name: Create confd directory
   ansible.builtin.file:
-    path: /etc/nginx/conf.d/default.conf
+    path: "{{ nginx_confd_directory }}"
+    state: directory
+    mode: '0700'
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+
+- name: Remove default configs
+  ansible.builtin.file:
+    path: "{{ nginx_conf_directory }}/{{ item }}"
     state: absent
+  loop:
+    - "fastcgi.conf.default"
+    - "fastcgi_params.default"
+    - "mime.types.default"
+    - "nginx.conf.default"
+    - "scgi_params.default"
+    - "uwsgi_params.default"
 
 - name: Remove default site
   ansible.builtin.file:
-    path: "/usr/share/nginx/html/{{ item }}"
+    path: "/usr/local/openresty/nginx/html/{{ item }}"
     state: absent
   loop:
     - "50x.html"
@@ -29,7 +44,7 @@
 - name: Create robots.txt
   ansible.builtin.copy:
     src: robots.txt
-    dest: /usr/share/nginx/html/robots.txt
+    dest: /usr/local/openresty/nginx/html/robots.txt
     owner: "{{ nginx_user }}"
     group: "{{ nginx_group }}"
     mode: '0644'
@@ -38,7 +53,7 @@
 - name: Create nginx.conf
   ansible.builtin.template:
     src: "nginx.conf.j2"
-    dest: "/etc/nginx/nginx.conf"
+    dest: "{{ nginx_conf_directory }}/nginx.conf"
     mode: '0600'
     owner: "{{ nginx_user }}"
     group: "{{ nginx_group }}"
@@ -51,7 +66,8 @@
     owner: "{{ nginx_user }}"
     group: "{{ nginx_group }}"
 
-- name: Enable Nginx service
+- name: Start and enable Openresty service
   ansible.builtin.systemd:
-    name: nginx
+    name: openresty
     enabled: true
+    state: "started"

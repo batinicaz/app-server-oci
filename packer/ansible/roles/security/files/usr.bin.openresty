@@ -1,6 +1,6 @@
 include <tunables/global>
 
-/usr/sbin/nginx {
+/usr/bin/openresty {
   include <abstractions/base>
   include <abstractions/nameservice>
   include <abstractions/openssl>
@@ -13,20 +13,20 @@ include <tunables/global>
   capability setgid,
   capability setuid,
 
-  /etc/nginx/** r,
+  /etc/openresty/** r,
   /opt/freshrss/** r,
   /run/php/php8.1-fpm.sock rw,
-  /usr/sbin/nginx r,
-  /usr/share/nginx/html/* r,
-  /var/log/nginx/** rw,
-  /var/run/nginx.pid w,
-  owner /run/nginx.pid rw,
+  /usr/bin/openresty r,
+  /usr/local/openresty/nginx/html/* r,
+  /usr/local/openresty/nginx/logs/** rw,
+  /usr/local/openresty/nginx/logs/nginx.pid w,
+  owner /usr/local/openresty/nginx/logs/nginx.pid rw,
   owner /var/cache/nginx/** rw,
 
   ^worker {
-    /etc/nginx/** r,
+    /etc/openresty/** r,
     /opt/freshrss/p/** r,
-    /var/log/nginx/** rw,
+    /usr/local/openresty/nginx/logs/** rw,
     /var/run/php/php-fpm.sock rw,
 
   }
