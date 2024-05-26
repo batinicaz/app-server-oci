@@ -1,0 +1,54 @@
+- name: Create install directory
+  ansible.builtin.file:
+    path: "{{ planka_install_dir }}"
+    state: directory
+    mode: '0700'
+
+- name: Set port number to use
+  ansible.builtin.set_fact:
+    planka_port: "{{ 5000 + range(0, 4999) | random }}"
+  until: fulltextrss_port != planka_port and redlib_port != planka_port and nitter_port != planka_port
+  retries: 100
+
+- name: Generate secret key
+  ansible.builtin.command: openssl rand -hex 64
+  changed_when: true
+  register: secret_key
+
+- name: Create compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ planka_install_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: '0700'
+  vars:
+    key: "{{ secret_key.stdout }}"
+
+- name: Create Nginx config file
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/planka.conf
+    mode: '0644'
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+
+- name: Fetch latest docker image
+  ansible.builtin.command: docker compose pull
+  args:
+    chdir: "{{ planka_install_dir }}"
+  changed_when: true
+
+- name: Start service
+  ansible.builtin.command: docker compose up --detach
+  args:
+    chdir: "{{ planka_install_dir }}"
+  changed_when: true
+
+- name: Setup backup and restore
+  ansible.builtin.include_tasks: backup-restore.yml

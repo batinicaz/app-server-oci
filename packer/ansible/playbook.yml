@@ -18,11 +18,16 @@
             password: "{{ mysql.freshrss }}"
             priv: '*.*:ALL,GRANT'
             host: localhost
+    - role: geerlingguy.docker
+      vars:
+        docker_install_compose_plugin: true
+        docker_install_compose: false
     - role: nginx
     - role: freshrss
     - role: fulltextrss
     - role: nitter
     - role: redlib
+    - role: planka
     - role: logrotate
       vars:
         logrotate_services:
@@ -48,4 +53,8 @@
             logs:
               - /var/log/nginx/redlib.access.log
               - /var/log/nginx/redlib.error.log
+          - name: planka
+            logs:
+              - /var/log/nginx/planka.access.log
+              - /var/log/nginx/planka.error.log
     - role: cleanup

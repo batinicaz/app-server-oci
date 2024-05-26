@@ -2,13 +2,6 @@
 # credit to https://github.com/heussd/fivefilters-full-text-rss-docker/tree/master
 # for building/maintaining a working docker image
 
-- name: Setup Docker
-  ansible.builtin.include_role:
-    name: geerlingguy.docker
-  vars:
-    docker_install_compose_plugin: true
-    docker_install_compose: false
-
 - name: Create install directory
   ansible.builtin.file:
     path: "{{ fulltextrss_install_dir }}"
