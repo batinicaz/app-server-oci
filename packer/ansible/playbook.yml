@@ -18,6 +18,10 @@
             password: "{{ mysql.freshrss }}"
             priv: '*.*:ALL,GRANT'
             host: localhost
+    - role: geerlingguy.docker
+      vars:
+        docker_install_compose_plugin: true
+        docker_install_compose: false
     - role: nginx
     - role: freshrss
     - role: fulltextrss
