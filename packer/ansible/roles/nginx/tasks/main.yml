@@ -66,6 +66,12 @@
     owner: "{{ nginx_user }}"
     group: "{{ nginx_group }}"
 
+# Latest V4 breaks OIDC
+- name: Install required version of session
+  ansible.builtin.command: opm get bungle/lua-resty-session=3.10
+  args:
+    creates: /usr/local/openresty/site/lualib/resty/session.lua
+
 - name: Install OIDC support
   ansible.builtin.command: opm get zmartzone/lua-resty-openidc
   args:

@@ -11,7 +11,7 @@ Includes the following applications:
 - :bird: [Nitter](https://github.com/zedeus/nitter) for providing RSS feeds for Twitter
 - :alien: [Redlib](https://github.com/redlib-org/redlib) for browsing Reddit
 - :card_index_dividers: [Planka](https://github.com/plankanban/planka) for task management
-- :globe_with_meridians: Nginx to serve FreshRSS and reverse proxy to other services
+- :globe_with_meridians: [OpenResty](https://github.com/openresty/openresty) to serve FreshRSS and reverse proxy to other services with support for OIDC auth.
 - :closed_lock_with_key: [Tailscale](https://github.com/tailscale/tailscale) for management (SSH removed)
 
 Along with the following config tweaks:
