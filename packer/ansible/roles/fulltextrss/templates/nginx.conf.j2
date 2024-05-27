@@ -9,8 +9,8 @@ server {
 
     root {{ fulltextrss_install_dir }}/;
 
-    access_log /var/log/nginx/fulltextrss.access.log;
-    error_log /var/log/nginx/fulltextrss.error.log crit;
+    access_log {{ nginx_logs_directory }}/fulltextrss.access.log;
+    error_log {{ nginx_logs_directory }}/fulltextrss.error.log crit;
 
     gzip on;
     gzip_comp_level 6;
@@ -20,6 +20,7 @@ server {
     gzip_types application/rss+xml;
 
     server_tokens off;
+    more_clear_headers Server;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

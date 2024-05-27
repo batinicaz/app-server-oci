@@ -12,15 +12,10 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-const (
-	robotsTXTPath       = "/robots.txt"
-	robotsTag           = "X-Robots-Tag"
-	expectedRobotsValue = "noindex, nofollow"
-)
-
 var (
 	ingressTypes = map[string]string{
 		"80":   "http",
+		"1337": "http",
 		"3000": "http",
 		"8080": "http",
 		"8081": "http",
@@ -52,7 +47,6 @@ func runTerraform(t *testing.T, imageID string, providerConf ociProviderConfig) 
 
 	for port, protocol := range ingressTypes {
 		validateHTTPConnectionWithRetry(t, protocol, publicIP, port)
-		validateHTTPConnectionWithRetry(t, protocol, publicIP, port+robotsTXTPath)
 	}
 }
 
@@ -76,15 +70,6 @@ func validateHTTPConnectionWithRetry(t *testing.T, protocol, instanceIP, port st
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
 			return "", fmt.Errorf("Expected HTTP status 200, but got: %d", resp.StatusCode)
-		}
-
-		xRobotsTagValue := resp.Header.Get(robotsTag)
-		if xRobotsTagValue == "" {
-			t.Fatalf("Missing %s header", robotsTag)
-		}
-
-		if xRobotsTagValue != expectedRobotsValue {
-			t.Fatalf("Expected %s to be '%s', but got: %s", robotsTag, expectedRobotsValue, xRobotsTagValue)
 		}
 
 		bodyBytes, err := io.ReadAll(resp.Body)

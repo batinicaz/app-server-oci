@@ -1,3 +1,7 @@
-nginx_no_index_conf: "/etc/nginx/no-index.conf"
+nginx_conf_directory: "/etc/openresty"
+nginx_confd_directory: "{{ nginx_conf_directory }}/conf.d"
+nginx_logs_directory: "/usr/local/openresty/nginx/logs"
 nginx_group: "www-data"
+nginx_no_index_conf: "{{ nginx_conf_directory }}/no-index.conf"
+nginx_service_name: "openresty"
 nginx_user: "www-data"

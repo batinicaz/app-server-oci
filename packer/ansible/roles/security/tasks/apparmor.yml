@@ -14,9 +14,9 @@
     mode: '0644'
   notify: Restart AppArmor
   loop:
-    - name: Nginx
-      src: usr.sbin.nginx
-      dest: usr.sbin.nginx
+    - name: Open Resty
+      src: usr.bin.openresty
+      dest: usr.bin.openresty
     - name: Nitter
       src: opt.nitter.nitter
       dest: opt.nitter.nitter

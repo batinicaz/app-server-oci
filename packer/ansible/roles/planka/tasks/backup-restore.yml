@@ -16,6 +16,17 @@
     dest: "{{ planka_install_dir }}/docker-restore.sh"
     mode: '0711'
 
+- name: Fix container names in scripts
+  ansible.builtin.replace:
+    path: "{{ item.file }}"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - {file: "{{ planka_install_dir }}/docker-backup.sh", regexp: 'PLANKA_DOCKER_CONTAINER_POSTGRES="planka_postgres_1"', replace: 'PLANKA_DOCKER_CONTAINER_POSTGRES="plank-postgres-1"'}
+    - {file: "{{ planka_install_dir }}/docker-backup.sh", regexp: 'PLANKA_DOCKER_CONTAINER_PLANKA="planka_planka_1"', replace: 'PLANKA_DOCKER_CONTAINER_PLANKA="planka-planka-1"'}
+    - {file: "{{ planka_install_dir }}/docker-restore.sh", regexp: 'PLANKA_DOCKER_CONTAINER_POSTGRES="planka_postgres_1"', replace: 'PLANKA_DOCKER_CONTAINER_POSTGRES="plank-postgres-1"'}
+    - {file: "{{ planka_install_dir }}/docker-restore.sh", regexp: 'PLANKA_DOCKER_CONTAINER_PLANKA="planka_planka_1"', replace: 'PLANKA_DOCKER_CONTAINER_PLANKA="planka-planka-1"'}
+
 - name: Setup DB backup cronjob (every day at 1AM)
   ansible.builtin.cron:
     name: Planka Backup
@@ -23,7 +34,7 @@
     hour: "1"
     minute: "0"
     user: root
-    job: "cd {{ planka_install_dir }}/backups && bash /opt/planka/backup/backup.sh && curl -fsS -m 10 --retry 5 -o /dev/null 'https://hc-ping.com/7ee5474d-e6d4-4fa0-80c2-752723605753'"
+    job: "cd {{ planka_install_dir }}/backups && bash /opt/planka/backup/docker-backup.sh && curl -fsS -m 10 --retry 5 -o /dev/null 'https://hc-ping.com/7ee5474d-e6d4-4fa0-80c2-752723605753'"
 
 - name: Setup cleanup job (every day at 00:01 AM)
   ansible.builtin.cron:
