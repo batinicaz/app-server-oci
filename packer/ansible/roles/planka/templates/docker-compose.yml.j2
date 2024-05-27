@@ -3,7 +3,7 @@ version: '3'
 services:
   planka:
     image: {{ planka_image }}
-    restart: on-failure
+    restart: always
     volumes:
       - user-avatars:/app/public/user-avatars
       - project-background-images:/app/public/project-background-images
@@ -17,6 +17,8 @@ services:
       - OIDC_ISSUER={{ planka.oidcIssuer }}
       - OIDC_CLIENT_ID={{ planka.oidcClientID }}
       - OIDC_CLIENT_SECRET={{ planka.oidcClientSecret }}
+      - OIDC_NAME_ATTRIBUTE=given_name
+      - OIDC_IGNORE_ROLES=true
       - OIDC_ENFORCED=true
     depends_on:
       postgres:
@@ -24,7 +26,7 @@ services:
 
   postgres:
     image: postgres:14-alpine
-    restart: on-failure
+    restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
