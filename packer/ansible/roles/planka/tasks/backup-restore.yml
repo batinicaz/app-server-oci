@@ -34,7 +34,7 @@
     hour: "1"
     minute: "0"
     user: root
-    job: "cd {{ planka_install_dir }}/backups && bash /opt/planka/backup/docker-backup.sh && curl -fsS -m 10 --retry 5 -o /dev/null 'https://hc-ping.com/7ee5474d-e6d4-4fa0-80c2-752723605753'"
+    job: "cd {{ planka_install_dir }}/backups && bash /opt/planka/docker-backup.sh && curl -fsS -m 10 --retry 5 -o /dev/null 'https://hc-ping.com/7ee5474d-e6d4-4fa0-80c2-752723605753'"
 
 - name: Setup cleanup job (every day at 00:01 AM)
   ansible.builtin.cron:
