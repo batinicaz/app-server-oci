@@ -16,3 +16,4 @@
   end
   
   ngx.req.set_header("X-User", res.id_token.sub)
+  ngx.req.set_header("Remote-User", res.id_token.name)
