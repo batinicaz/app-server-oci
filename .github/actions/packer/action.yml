@@ -7,7 +7,10 @@ inputs:
     description: The password to access the encrypted ansible vault
     required: true
   fingerprint:
-    description: OCI fingerpint
+    description: OCI fingerprint
+    required: true
+  githubToken:
+    description: The auto injected secrets.GITHUB_TOKEN
     required: true
   hcpClientID:
     description: HCP client ID
@@ -76,7 +79,7 @@ runs:
 
     - name: Build
       run: >
-        docker run --rm -v "$(pwd):/work" -w /work
+        docker run --rm -v "$(pwd):/work" -w /work -e PACKER_GITHUB_API_TOKEN=${{ inputs.githubToken }}
         ghcr.io/batinicaz/packer:latest sh -c
         'set -e && echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
         go test -timeout 1h -v ./packer/tests ${{ env.DELETE_FLAG }}
