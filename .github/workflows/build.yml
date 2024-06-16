@@ -43,6 +43,7 @@ jobs:
         with:
           ansibleVaultPass: "${{ secrets.VAULT_PASS }}"
           fingerprint: "${{ secrets.OCI_FINGERPRINT }}"
+          githubToken: "${{ secrets.GITHUB_TOKEN }}"
           hcpClientID: "${{ secrets.HCP_CLIENT_ID }}"
           hcpClientSecret: "${{ secrets.HCP_CLIENT_SECRET }}"
           keepImage: "${{ github.ref == 'refs/heads/main' }}"
