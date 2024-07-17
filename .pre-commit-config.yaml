@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/ansible/ansible-lint
-    rev: v6.22.2
+    rev: v24.10.0
     hooks:
       - id: ansible-lint
 
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.23
+    rev: v0.1.24
     hooks:
       - id: packer-validate
       - id: terraform-fmt
@@ -13,6 +13,6 @@ repos:
       - id: terraform-validate
 
   - repo: https://github.com/bridgecrewio/checkov.git
-    rev: 3.2.21
+    rev: 3.2.305
     hooks:
       - id: checkov
