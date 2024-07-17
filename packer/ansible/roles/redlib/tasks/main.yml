@@ -52,6 +52,12 @@
     mode: '0755'
   when: not redlib_installed.stat.exists
 
+- name: Install build dependencies
+  ansible.builtin.apt:
+    name: gcc
+    state: present
+  when: not redlib_installed.stat.exists
+
 - name: Install rust
   ansible.builtin.command: /tmp/sh.rustup.rs -y
   when: not redlib_installed.stat.exists
@@ -105,6 +111,14 @@
   with_items:
     - "{{ redlib_download.dest }}"
     - "{{ redlib_build_dir }}"
+  when: not redlib_installed.stat.exists
+
+- name: Remove build dependencies
+  ansible.builtin.apt:
+    name: gcc
+    autoremove: true
+    state: absent
+    purge: true
   when: not redlib_installed.stat.exists
 
 - name: Set up Redlib service

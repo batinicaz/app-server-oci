@@ -49,7 +49,7 @@ variable "source_image_username" {
 variable "ubuntu_version" {
   description = "The version of ubuntu to use as a source image"
   type        = string
-  default     = "22.04"
+  default     = "24.04"
 }
 
 variable "version" {

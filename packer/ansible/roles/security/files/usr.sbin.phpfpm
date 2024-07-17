@@ -18,7 +18,7 @@ include <tunables/global>
   /etc/php/*/fpm/** r,
   /opt/freshrss/p/** r,
   /run/mysqld/mysqld.sock rw,
-  /run/php/php8.1-fpm.sock w,
+  /run/php/php8.3-fpm.sock w,
   /usr/sbin/php-fpm* r,
   /var/log/php/** rw,
   /var/run/php/php-fpm.sock w,
@@ -28,9 +28,9 @@ include <tunables/global>
   owner /opt/freshrss/*.php r,
   owner /opt/freshrss/app/* r,
   owner /opt/freshrss/lib/* r,
-  owner /run/php/php8.1-fpm.pid w,
-  owner /run/php/php8.1-fpm.sock rw,
+  owner /run/php/php8.3-fpm.pid w,
+  owner /run/php/php8.3-fpm.sock rw,
   owner /run/systemd/notify w,
-  owner /var/log/php8.1-fpm.log w,
+  owner /var/log/php8.3-fpm.log w,
 
 }

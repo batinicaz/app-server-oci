@@ -15,7 +15,7 @@ include <tunables/global>
 
   /etc/openresty/** r,
   /opt/freshrss/** r,
-  /run/php/php8.1-fpm.sock rw,
+  /run/php/php8.3-fpm.sock rw,
   /usr/bin/openresty r,
   /usr/local/openresty/nginx/html/* r,
   /usr/local/openresty/nginx/logs/** rw,
