@@ -50,7 +50,8 @@ func runTerraform(t *testing.T, imageID string, providerConf ociProviderConfig) 
 	}
 }
 
-func validateHTTPConnectionWithRetry(t *testing.T, protocol, instanceIP, port string) {
+func validateHTTPConnectionWithRetry(t *testing.T, protocol string, instanceIP string, port string) {
+	t.Logf("Testing the service running on port %s", port)
 	maxRetries := 10
 	sleepBetweenRetries := 10 * time.Second
 	retry.DoWithRetry(t, "HTTP Request", maxRetries, sleepBetweenRetries, func() (string, error) {
