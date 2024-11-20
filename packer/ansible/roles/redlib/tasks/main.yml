@@ -12,44 +12,35 @@
   until: fulltextrss_port != redlib_port and nitter_port != redlib_port
   retries: 100
 
-- name: Get latest release
-  ansible.builtin.uri:
-    url: "https://api.github.com/repos/redlib-org/redlib/releases/latest"
-    method: GET
-    return_content: true
-  register: redlib_release
-
-- name: Download latest release
-  ansible.builtin.get_url:
-    # checkov:skip=CKV2_ANSIBLE_2 URL is https but checkov can not tell
-    url: "{{ redlib_release.json.tarball_url }}"
-    dest: "/tmp/redlib.tar.gz"
-    mode: '0644'
-  register: redlib_download
-
-- name: Create build dir
-  ansible.builtin.file:
-    path: "/tmp/redlib"
-    state: directory
-    mode: '0755'
-
-- name: Extract downloaded release
-  ansible.builtin.unarchive:
-    src: "{{ redlib_download.dest }}"
-    dest: "/tmp/redlib"
-    remote_src: true
-    extra_opts: "--strip-components=1"
-
 - name: Check if redlib installed
   ansible.builtin.stat:
     path: "{{ redlib_install_dir }}/redlib"
   register: redlib_installed
+
+- name: Example clone of a single branch
+  ansible.builtin.git:
+    repo: https://github.com/redlib-org/redlib
+    dest: "{{ redlib_build_dir }}"
+    version: main
+
+- name: Create build dir
+  ansible.builtin.file:
+    path: "{{ redlib_build_dir }}"
+    state: directory
+    mode: '0755'
+  when: not redlib_installed.stat.exists
 
 - name: Download rust installer
   ansible.builtin.get_url:
     url: https://sh.rustup.rs
     dest: /tmp/sh.rustup.rs
     mode: '0755'
+  when: not redlib_installed.stat.exists
+
+- name: Install build dependencies
+  ansible.builtin.apt:
+    name: gcc
+    state: present
   when: not redlib_installed.stat.exists
 
 - name: Install rust
@@ -103,8 +94,15 @@
     path: "{{ item }}"
     state: absent
   with_items:
-    - "{{ redlib_download.dest }}"
     - "{{ redlib_build_dir }}"
+  when: not redlib_installed.stat.exists
+
+- name: Remove build dependencies
+  ansible.builtin.apt:
+    name: gcc
+    autoremove: true
+    state: absent
+    purge: true
   when: not redlib_installed.stat.exists
 
 - name: Set up Redlib service

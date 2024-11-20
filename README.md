@@ -2,7 +2,7 @@
 
 Uses packer and Ansible to create a custom image for use in Oracle Cloud Infrastructure (OCI).
 
-Built on latest Ubuntu 22.04 OCI image. Builds every day at 3AM.
+Built on latest Ubuntu 24.04 OCI image. Builds every day at 3AM.
 
 Includes the following applications:
 

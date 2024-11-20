@@ -12,7 +12,7 @@ $(KEY_FILE):
 	ssh-keygen -t rsa -b 4096 -f $(KEY_FILE) -N ''
 
 create-vm: $(KEY_FILE)
-	@multipass info $(VM_NAME) || multipass launch --name $(VM_NAME) --memory 6g --cpus 2 --disk 10G jammy
+	@multipass info $(VM_NAME) || multipass launch --name $(VM_NAME) --memory 6g --cpus 2 --disk 10G noble
 
 add-public-key: create-vm
 	@echo "Adding public key to authorized_users file..."
