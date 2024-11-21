@@ -48,15 +48,16 @@
     update_cache: true
     force_apt_get: true
 
-- name: Install pipx
-  ansible.builtin.apt:
-    name: pipx
-    state: present
+# Install pipx by using GitHub release as the package in the LTS repos is out of date: https://github.com/pypa/pipx/issues/1524
+- name: Install pipx from GitHub
+  ansible.builtin.include_tasks: pipx.yml
 
 - name: Install oci-cli
   community.general.pipx:
     name: oci-cli
     state: present
+    global: true
+    executable: /usr/local/bin/pipx
 
 - name: Configure rsyslog to redirect cron logs
   ansible.builtin.lineinfile:
