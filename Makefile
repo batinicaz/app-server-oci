@@ -19,7 +19,7 @@ add-public-key: create-vm
 	multipass exec $(VM_NAME) -- bash -c "echo '$(shell ssh-keygen -y -f $(KEY_FILE))' >> ~/.ssh/authorized_keys"
 
 run-playbook:
-	ansible-galaxy install -r $(ROLES_FILE); \
+	ansible-galaxy install --force -r $(ROLES_FILE); \
 	ANSIBLE_HOST_KEY_CHECKING=false \
     ansible-playbook -i "$(shell multipass info "$(VM_NAME)" | grep "^IPv4:" | sed "s/IPv4:[ ]*//")," \
     --extra-vars "local_dev=true" \

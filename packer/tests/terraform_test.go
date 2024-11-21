@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"testing"
 	"time"
 
@@ -46,12 +47,21 @@ func runTerraform(t *testing.T, imageID string, providerConf ociProviderConfig) 
 	publicIP := terraform.Output(t, terraformOptions, "public_ip")
 
 	for port, protocol := range ingressTypes {
+		if port == "8081" {
+			// While redlib having issues being blocked by reddit accept 404's
+			validateHTTPConnectionWithRetry(t, protocol, publicIP, port, http.StatusOK, http.StatusNotFound)
+			continue
+		}
 		validateHTTPConnectionWithRetry(t, protocol, publicIP, port)
 	}
 }
 
-func validateHTTPConnectionWithRetry(t *testing.T, protocol string, instanceIP string, port string) {
+func validateHTTPConnectionWithRetry(t *testing.T, protocol string, instanceIP string, port string, statusCodes ...int) {
+	if len(statusCodes) == 0 {
+		statusCodes = append(statusCodes, http.StatusOK)
+	}
 	t.Logf("Testing the service running on port %s", port)
+	t.Logf("Will accept status codes: %v", statusCodes)
 	maxRetries := 10
 	sleepBetweenRetries := 10 * time.Second
 	retry.DoWithRetry(t, "HTTP Request", maxRetries, sleepBetweenRetries, func() (string, error) {
@@ -69,8 +79,8 @@ func validateHTTPConnectionWithRetry(t *testing.T, protocol string, instanceIP s
 		}
 
 		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			return "", fmt.Errorf("Expected HTTP status 200, but got: %d", resp.StatusCode)
+		if !slices.Contains(statusCodes, resp.StatusCode) {
+			return "", fmt.Errorf("Expected one of the HTTP status codes %v, but got: %d", statusCodes, resp.StatusCode)
 		}
 
 		bodyBytes, err := io.ReadAll(resp.Body)
