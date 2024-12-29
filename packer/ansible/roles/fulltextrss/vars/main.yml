@@ -1,4 +1,4 @@
 fulltextrss_install_dir: "/opt/fulltext-rss"
 fulltextrss_config_dir: "site-config"
 fulltextrss_config_file: "custom_config.php"
-fulltextrss_image: "heussd/fivefilters-full-text-rss:latest"
+fulltextrss_image: "ghcr.io/batinicaz/fulltextrss:3.9.13"
