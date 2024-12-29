@@ -57,6 +57,14 @@
     name: "{{ nginx_service_name }}"
     state: restarted
 
+- name: Log into GHCR
+  community.docker.docker_login:
+    registry_url: ghcr.io
+    username: batinicaz
+    password: "{{ fulltextrss.container_reg_token }}"
+    tls: true
+    validate_certs: true
+
 - name: Fetch latest docker image
   ansible.builtin.command: docker compose pull
   args:
