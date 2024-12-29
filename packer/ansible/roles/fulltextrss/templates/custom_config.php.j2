@@ -59,19 +59,6 @@ $options->max_entries = 10;
 // from the output.
 $options->content = 'user';
 
-// HTML5 output
-// ----------------------
-// Full-Text RSS used to rely on libxml to output HTML extracted from
-// a web page. Since version 3.8 we use HTML5-PHP by default.
-// If you prefer the old output, either set this to false or pass &content=1
-// in the querystring.
-//
-// Possible values...
-// HTML5 (slower): true
-// libxml (faster): false
-// HTML5 unless user overrides (&content=1): 'user' (default)
-$options->html5_output = 'user';
-
 // Excerpts
 // ----------------------
 // By default Full-Text RSS does not include excerpts in the output.
@@ -236,9 +223,23 @@ $options->remove_native_ads = false;
 // If overriding with an environment variable, separate username and password with a colon, e.g.:
 // ftr_admin_credentials: admin:my-secret-password
 // Example: $options->admin_credentials = array('username'=>'admin', 'password'=>'my-secret-password');
+$options->admin_credentials = array('username'=>'admin', 'password'=>'');
 
-// URLs to allow
+// Hosts to allow
 // ----------------------
+// List of hostnames which the service will accept.
+// If the list is empty, all URLs (except those specified in the blocked list below)
+// will be permitted.
+// Note: for feeds, this option applies to both feed URLs and item URLs within those feeds.
+// Empty: array();
+// Non-empty example: array('example.com', 'anothersite.org');
+// Note: if an allowed host redirects to another host, this is currently not blocked,
+// but will be in the future.
+$options->allowed_hosts = array();
+
+// URLs to allow (deprecated)
+// ----------------------
+// NOTE: Please use $options->allowed_hosts instead - if that's used, this will be ignored.
 // List of URLs (or parts of a URL) which the service will accept.
 // If the list is empty, all URLs (except those specified in the blocked list below)
 // will be permitted.
@@ -251,7 +252,8 @@ $options->allowed_urls = array();
 // ----------------------
 // List of URLs (or parts of a URL) which the service will not accept.
 // Note: this list is ignored if allowed_urls is not empty.
-// Note: for feeds, this option applies to both feed URLs and item URLs within those feeds.
+// Note: for feeds, this option applies to both feed URLs and item URLs within those feeds,
+// but not to URLs which are the result of a HTTP redirect (that will be fixed in the future).
 $options->blocked_urls = array();
 
 // Blocked message
@@ -367,25 +369,33 @@ $options->favour_feed_titles = 'user';
 
 // Allowed HTML parsers
 // ----------------------
-// Full-Text RSS attempts to use PHP's libxml extension to process HTML.
-// While fast, on some sites it may not always produce good results.
-// For these sites, you can specify an alternative HTML parser:
-// parser: html5php
+// Full-Text RSS will use HTML5PHP to parse HTML by default.
+// If HTML5 parsing is not required, you can request parsing with libxml:
+// &parser=libxml
 // The html5php parser is bundled with Full-Text RSS.
 // see https://github.com/Masterminds/html5-php
 //
-// To disable HTML parsing with html5php, remove it from this list.
-// By default we allow both libxml and html5php.
-// Note: html5php requires PHP 5.3 or higher. If you're running PHP 5.2,
-// we'll always use libxml.
-$options->allowed_parsers = array('libxml', 'html5php');
-//$options->allowed_parsers = array('libxml'); //disable html5php - forcing libxml in all cases
+// Note: html5php must appear in this list.
+$options->allowed_parsers = array('html5php', 'libxml');
+//$options->allowed_parsers = array('html5php'); //disables libxml - forcing html5php in all cases
 
-// Parser override in querystring
+// Default parser
+// --------------
+// By default, Full-Text RSS will use HTML5-PHP (an HTML5
+// parser, but written in PHP).
+// You can also set this 'libxml' which might be a little faster but not as compatible
+// with modern HTML.
+// The HTML5-PHP parser is bundled with Full-Text RSS, so available for all users.
+// see https://github.com/Masterminds/html5-php
+$options->default_parser = 'html5php';
+
+// Allow parser override
 // ---------------------
-// If enabled, user can pass &parser=html5php to override default parser.
+// If enabled, user can pass &parser=html5php in the querystring to override the default parser.
+// Site config files can also specify a parser to use, e.g.:
+// parser: html5php
 // Possible values:
-// * false: Don't allow override in querystring
+// * false: Don't allow overriding
 // * true: Allow (default)
 $options->allow_parser_override = true;
 
@@ -409,7 +419,7 @@ $options->cors = false;
 // sure direct requests are randomly made as well.
 $options->proxy_servers = array();
 // For example:
-//$options->proxy_servers = array('example1'=>array('host'=>'127.0.0.1:8888'), 'example2'=>array('host'=>'127.0.0.1:8888', 'auth'=>'user:pass'), 'direct'=>array());
+//$options->proxy_servers = array('example1'=>array('host'=>'127.0.0.1:8888'), 'example2'=>array('host'=>'127.0.0.1:8888', 'auth'=>'user:pass'), 'direct'=>'direct');
 // If Polipo is installed and you want to use it as a caching proxy, uncomment the following line.
 //$options->proxy_servers = array('polipo'=>array('host'=>'127.0.0.1:8123'));
 
@@ -466,7 +476,10 @@ $options->fingerprints = array(
 	// WordPress (hosted)
 	// '<meta name="generator" content="WordPress.com"' => array('hostname'=>'fingerprint.wordpress.com', 'head'=>true),
 	// WordPress (self-hosted and hosted)
-	'<meta name="generator" content="WordPress' => array('hostname'=>'fingerprint.wordpress.com', 'head'=>true)
+	'<meta name="generator" content="WordPress' => array('hostname'=>'fingerprint.wordpress.com', 'head'=>true),
+	'<meta data-rh="true" property="al:ios:app_name" content="Medium"/>' => array('hostname'=>'fingerprint.medium.com', 'head'=>true),
+	// Substack
+	'<link rel="stylesheet" type="text/css" href="https://substackcdn.com/min/main.css' => array('hostname'=>'fingerprint.substack.com', 'head'=>false)
 );
 
 // URL Rewriting
@@ -483,7 +496,12 @@ $options->rewrite_url = array(
 	'docs.google.com' => array('/Doc?' => '/View?'),
 	'tnr.com' => array('tnr.com/article/' => 'tnr.com/print/article/'),
 	'.m.wikipedia.org' => array('.m.wikipedia.org' => '.wikipedia.org'),
-	'm.vanityfair.com' => array('m.vanityfair.com' => 'www.vanityfair.com')
+	'm.vanityfair.com' => array('m.vanityfair.com' => 'www.vanityfair.com'),
+	// We get to the following with the single_page_link directive in
+	// the washingtonpost.com.txt site config, but that uses 2 requests,
+	// and responses are currently slow from their server,
+	// so this saves us a request
+	'washingtonpost.com' => array('_story.html' => '_print.html?noredirect=on')
 );
 
 // Content-Type exceptions
@@ -523,11 +541,11 @@ $options->cache_cleanup = 100;
 /// DO NOT CHANGE ANYTHING BELOW THIS ///////////
 /////////////////////////////////////////////////
 
-if (!defined('_FF_FTR_VERSION')) define('_FF_FTR_VERSION', '3.8');
+if (!defined('_FF_FTR_VERSION')) define('_FF_FTR_VERSION', '3.9.13');
 
 if (basename(__FILE__) == 'config.php') {
 	if (file_exists(dirname(__FILE__).'/custom_config.php')) {
-		require_once dirname(__FILE__).'/custom_config.php';
+		require dirname(__FILE__).'/custom_config.php';
 	}
 
 	// check for environment variables - often used on cloud platforms
