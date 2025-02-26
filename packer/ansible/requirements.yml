@@ -8,4 +8,4 @@ roles:
   - name: geerlingguy.docker
     version: 7.4.3
   - name: geerlingguy.mysql
-    version: 4.3.4
+    version: 4.3.5
