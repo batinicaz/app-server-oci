@@ -7,7 +7,7 @@ toolchain go1.24.0
 require (
 	github.com/gruntwork-io/terratest v0.48.2
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
+	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7
 )
 
 require (
