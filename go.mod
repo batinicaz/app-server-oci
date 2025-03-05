@@ -2,7 +2,7 @@ module batinicaz/freshrss-oci
 
 go 1.23.0
 
-toolchain go1.24.0
+toolchain go1.24.1
 
 require (
 	github.com/gruntwork-io/terratest v0.48.2
