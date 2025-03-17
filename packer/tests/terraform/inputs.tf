@@ -58,7 +58,7 @@ variable "terraform_tenancy_ocid" {
 locals {
   defined_tags = {
     "terraform.managed" = "packer"
-    "terraform.name"    = "Fresh RSS Build"
-    "terraform.repo"    = "https://github.com/batinicaz/freshrss-oci"
+    "terraform.name"    = "App Server Build"
+    "terraform.repo"    = "https://github.com/batinicaz/app-server-oci"
   }
 }

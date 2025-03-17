@@ -16,7 +16,7 @@ inputs:
   imageName:
     description: 'Name of the images to manage'
     required: false
-    default: 'freshrss-'
+    default: 'app-server-'
   ociCliVersion:
     description: 'Version of OCI CLI to install'
     required: false

@@ -4,11 +4,6 @@ variable "availability_domain" {
   description = "Availability domain where instance will be launched. Default is the always free domain."
 }
 
-variable "hcp_packer_bucket_name" {
-  type        = string
-  description = "The name of the HCP bucket in which to store build info"
-}
-
 variable "instance_shape" {
   type        = string
   default     = "VM.Standard.A1.Flex"
@@ -75,7 +70,7 @@ source "oracle-oci" "ubuntu" {
   compartment_ocid       = var.terraform_tenancy_ocid
   fingerprint            = var.oci_fingerprint
   image_compartment_ocid = var.terraform_tenancy_ocid
-  image_name             = "freshrss-${var.version}"
+  image_name             = "app-server-${var.version}"
   key_file               = var.oci_key_file
   ssh_username           = var.source_image_username
   shape                  = var.instance_shape
@@ -89,22 +84,28 @@ source "oracle-oci" "ubuntu" {
   }
 
   create_vnic_details {
-    display_name = "packer-build-freshrss-${var.version}"
+    display_name = "packer-build-app-server-${var.version}"
   }
 
   defined_tags_json = jsonencode({
     terraform = {
       managed = "packer"
-      name    = "freshrss-${var.version}"
-      repo    = "https://github.com/batinicaz/freshrss-oci"
+      name    = "app-server-${var.version}"
+      repo    = "https://github.com/batinicaz/app-server-oci"
     }
   })
+
+  tags = {
+    build-time     = "${timestamp()}"
+    ubuntu-version = var.ubuntu_version
+    version        = var.version
+  }
 
   instance_defined_tags_json = jsonencode({
     terraform = {
       managed = "packer"
-      name    = "Fresh RSS Build"
-      repo    = "https://github.com/batinicaz/freshrss-oci"
+      name    = "App Server Build"
+      repo    = "https://github.com/batinicaz/app-server-oci"
     }
   })
 
@@ -126,19 +127,5 @@ build {
     extra_arguments = [
       "--vault-password-file=.vault-password"
     ]
-  }
-
-  hcp_packer_registry {
-    bucket_name = "oci-images-freshrss-${var.hcp_packer_bucket_name}"
-    description = "Images for Oracle Cloud Infrastructure"
-
-    bucket_labels = {
-      platform = "oci"
-    }
-
-    build_labels = {
-      build-time     = timestamp()
-      ubuntu-version = var.ubuntu_version
-    }
   }
 }

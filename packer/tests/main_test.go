@@ -14,9 +14,6 @@ import (
 
 var deleteImage bool
 var fingerprint string
-var hcpBucketName string
-var hcpClientID string
-var hcpClientSecret string
 var imageID string
 var privateKey string
 var rootTenancyOCID string
@@ -43,9 +40,6 @@ func TestMain(m *testing.M) {
 	flag.BoolVar(&deleteImage, "deleteImage", false, "Delete the built image from OCI")
 	flag.BoolVar(&skipDestroy, "skipDestroy", false, "Used for local dev, if set terraform stack will be left up after test run for debugging")
 	flag.StringVar(&fingerprint, "fingerprint", "", "The fingerprint of the key used to authenticate with OCI")
-	flag.StringVar(&hcpBucketName, "hcpBucketName", "dev", "The name of the HCP bucket in which to store build info")
-	flag.StringVar(&hcpClientID, "hcpClientID", "", "The ID of the HCP Packer Registry where build metadata is to be stored")
-	flag.StringVar(&hcpClientSecret, "hcpClientSecret", "", "The secret to authenticate with HCP Packer Registry where build metadata is stored")
 	flag.StringVar(&imageID, "imageID", "", "Used for local dev, providing an existing image ID allows skipping the packer build and just running the terraform/infra tests")
 	flag.StringVar(&privateKey, "privateKey", "", "The base64 encoded private key to authenticate with OCI")
 	flag.StringVar(&region, "region", "", "The region in which to create resources")
@@ -63,11 +57,6 @@ func TestAndBuildImage(t *testing.T) {
 	buildConfig := &buildConfig{
 		subnetOCID: subnetOCID,
 		version:    version,
-	}
-
-	hcpConf := &hcpConfig{
-		clientID:     hcpClientID,
-		clientSecret: hcpClientSecret,
 	}
 
 	rawKey, err := base64.StdEncoding.DecodeString(privateKey)
@@ -92,7 +81,7 @@ func TestAndBuildImage(t *testing.T) {
 	if imageID == "" {
 		var err error
 		t.Logf("Running packer build")
-		imageID, err = packerBuild(t, *hcpConf, *providerConf, *buildConfig)
+		imageID, err = packerBuild(t, *providerConf, *buildConfig)
 		require.NoErrorf(t, err, "Packer build failed: %s", err)
 	}
 

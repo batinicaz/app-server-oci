@@ -1,4 +1,4 @@
-- name: Build Fress RSS OCI Image
+- name: Build App Server OCI Image
   hosts: all
   become: true
   vars_files:
