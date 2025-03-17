@@ -1,6 +1,6 @@
-# freshrss-oci
+# app-server-oci
 
-Uses packer and Ansible to create a custom image for use in Oracle Cloud Infrastructure (OCI).
+Uses packer and Ansible to create a custom image for use in Oracle Cloud Infrastructure (OCI) for my selfhosted applications.
 
 Built on latest Ubuntu 24.04 OCI image. Builds every day at 3AM.
 
@@ -32,7 +32,7 @@ Along with the following config tweaks:
 
 ## Deployment
 
-Deployed via Terraform, see: [batinicaz/freshrss](https://github.com/batinicaz/freshrss)
+Deployed via Terraform, see: [batinicaz/app-server](https://github.com/batinicaz/app-server)
 
 ### Nitter Sessions
 

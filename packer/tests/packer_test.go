@@ -11,28 +11,17 @@ type buildConfig struct {
 	version    string
 }
 
-type hcpConfig struct {
-	clientID     string
-	clientSecret string
-}
-
-func packerBuild(t *testing.T, hcpConf hcpConfig, providerConf ociProviderConfig, buildConf buildConfig) (string, error) {
+func packerBuild(t *testing.T, providerConf ociProviderConfig, buildConf buildConfig) (string, error) {
 	packerOptions := &packer.Options{
 		Template: "../packer.pkr.hcl",
 
 		Vars: map[string]string{
-			"hcp_packer_bucket_name": hcpBucketName,
 			"oci_fingerprint":        providerConf.fingerprint,
 			"oci_key_file":           providerConf.privateKeyFilePath,
 			"root_tenancy_ocid":      providerConf.rootTenancyOCID,
 			"subnet_ocid":            buildConf.subnetOCID,
 			"terraform_tenancy_ocid": providerConf.terraformTenancyOCID,
 			"version":                buildConf.version,
-		},
-
-		Env: map[string]string{
-			"HCP_CLIENT_ID":     hcpConf.clientID,
-			"HCP_CLIENT_SECRET": hcpConf.clientSecret,
 		},
 	}
 

@@ -12,12 +12,6 @@ inputs:
   githubToken:
     description: The auto injected secrets.GITHUB_TOKEN
     required: true
-  hcpClientID:
-    description: HCP client ID
-    required: true
-  hcpClientSecret:
-    description: HCP client secret
-    required: true
   keepImage:
     description: Keep the image available if tests pass?
     default: 'false'
@@ -64,14 +58,6 @@ runs:
         echo DELETE_FLAG=${deleteFlag} >> $GITHUB_ENV
       shell: bash
 
-    - name: Set hcpBucketName flag
-      run: |
-        hcpBucketName='unstable'
-        if [[ "${{ github.ref_name }}" == "main" ]]; then
-          hcpBucketName='stable'
-        fi
-        echo BUCKET_NAME=${hcpBucketName} >> $GITHUB_ENV
-      shell: bash
 
     - name: Set version flag
       run: echo "VERSION=${{ github.ref_name }}-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
@@ -83,10 +69,7 @@ runs:
         ghcr.io/batinicaz/packer:latest sh -c
         'set -e && echo ${{ inputs.ansibleVaultPass }} > packer/tests/.vault-password &&
         go test -timeout 1h -v ./packer/tests ${{ env.DELETE_FLAG }}
-        -hcpBucketName ${{ env.BUCKET_NAME }}
         -fingerprint "${{ inputs.fingerprint }}"
-        -hcpClientID "${{ inputs.hcpClientID }}"
-        -hcpClientSecret "${{ inputs.hcpClientSecret }}"
         -privateKey "${{ inputs.privateKey }}"
         -region "${{ inputs.region }}"
         -subnetOCID "${{ inputs.subnetOCID }}"

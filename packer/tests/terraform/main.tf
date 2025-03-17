@@ -1,13 +1,13 @@
-resource "oci_core_instance" "freshrss" {
+resource "oci_core_instance" "app_server" {
   availability_domain                 = var.availability_domain
   compartment_id                      = var.terraform_tenancy_ocid
   defined_tags                        = local.defined_tags
-  display_name                        = "packer-test-freshrss"
+  display_name                        = "packer-test-app-server"
   is_pv_encryption_in_transit_enabled = true
   shape                               = var.instance_shape
 
   create_vnic_details {
-    nsg_ids   = [oci_core_network_security_group.freshrss.id]
+    nsg_ids   = [oci_core_network_security_group.app_server.id]
     subnet_id = var.subnet_ocid
   }
 
@@ -31,17 +31,17 @@ resource "oci_core_instance" "freshrss" {
   }
 }
 
-resource "oci_core_network_security_group" "freshrss" {
+resource "oci_core_network_security_group" "app_server" {
   compartment_id = var.terraform_tenancy_ocid
-  display_name   = "Fresh RSS Packer Build Test Security Group"
+  display_name   = "App Server Packer Build Test Security Group"
   defined_tags   = local.defined_tags
   vcn_id         = data.oci_core_subnet.selected.vcn_id
 }
 
-resource "oci_core_network_security_group_security_rule" "freshrss" {
+resource "oci_core_network_security_group_security_rule" "app_server" {
   // checkov:skip=CKV_OCI_21: Intentionally using stateful rules
   for_each                  = var.ingress_ports
-  network_security_group_id = oci_core_network_security_group.freshrss.id
+  network_security_group_id = oci_core_network_security_group.app_server.id
   description               = "Allow ${each.key} from test runner"
   direction                 = "INGRESS"
   protocol                  = "6" // TCP

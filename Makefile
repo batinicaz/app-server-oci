@@ -3,6 +3,7 @@ all: create-vm add-public-key run-playbook
 
 ANSIBLE_DIR := packer/ansible
 CURRENT_DIR := $(shell basename "$(CURDIR)")
+JOB_NAME ?= Build
 ROLES_FILE := $(ANSIBLE_DIR)/requirements.yml
 VM_NAME ?= $(CURRENT_DIR)
 
@@ -29,7 +30,7 @@ run-playbook:
     $(ANSIBLE_DIR)/playbook.yml || [ -n "$(SKIP_CLEAN)" ] || make clean
 
 gha:
-	act --container-architecture linux/amd64 --var-file gha.env --secret-file gha.secrets --secret GITHUB_TOKEN=$(shell gh auth token)
+	act --container-architecture linux/amd64 --var-file gha.env --secret-file gha.secrets --secret GITHUB_TOKEN=$(shell gh auth token) --job $(JOB_NAME)
 	find . -type f -iname *.lock* -delete
 
 clean:
