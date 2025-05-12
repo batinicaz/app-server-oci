@@ -1,2 +1,2 @@
 planka_install_dir: "/opt/planka"
-planka_image: "ghcr.io/plankanban/planka:latest"
+planka_image: "ghcr.io/plankanban/planka:2.0.0-rc.2"
