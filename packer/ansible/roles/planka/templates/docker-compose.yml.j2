@@ -12,7 +12,9 @@ services:
     environment:
       - BASE_URL=https://{{ planka.base_url }}
       - DATABASE_URL=postgresql://postgres@postgres/planka
+      - DEFAULT_LANGUAGE=en-GB
       - SECRET_KEY={{ key }}
+      - TRUST_PROXY=true
       - OIDC_ISSUER={{ planka.oidcIssuer }}
       - OIDC_CLIENT_ID={{ planka.oidcClientID }}
       - OIDC_CLIENT_SECRET={{ planka.oidcClientSecret }}
