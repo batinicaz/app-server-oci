@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/gruntwork-io/terratest v0.50.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
+	golang.org/x/exp v0.0.0-20250808145144-a408d31f581a
 )
 
 require (
@@ -35,13 +35,13 @@ require (
 	github.com/tmccombs/hcl2json v0.6.5 // indirect
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/zclconf/go-cty v1.16.2 // indirect
-	golang.org/x/crypto v0.40.0 // indirect
-	golang.org/x/mod v0.26.0 // indirect
-	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/mod v0.27.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
-	golang.org/x/tools v0.35.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/tools v0.36.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
