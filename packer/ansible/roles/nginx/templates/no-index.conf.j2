@@ -1,5 +1,5 @@
 add_header X-Robots-Tag "noindex, nofollow";
 
 location /robots.txt {
-    alias {{ robots_txt.dest }};
+    alias {{ nginx_robots_txt.dest }};
 }

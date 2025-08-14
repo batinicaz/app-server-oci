@@ -6,32 +6,32 @@
 - name: Check if pipx installed
   ansible.builtin.stat:
     path: "/usr/local/bin/pipx"
-  register: pipx_installed
+  register: setup_pipx_installed
 
 - name: Get latest release of pipx
   ansible.builtin.uri:
     url: "https://api.github.com/repos/pypa/pipx/releases/latest"
     method: GET
     return_content: true
-  register: pipx_release_info
-  when: not pipx_installed.stat.exists
+  register: setup_pipx_release_info
+  when: not setup_pipx_installed.stat.exists
 
 - name: Download pipx
   ansible.builtin.get_url:
-    url: "https://github.com/pypa/pipx/releases/download/{{ pipx_release_info.json.tag_name }}/pipx.pyz"
+    url: "https://github.com/pypa/pipx/releases/download/{{ setup_pipx_release_info.json.tag_name }}/pipx.pyz"
     dest: "/tmp/pipx.pyz"
-    mode: '0755'
-  when: not pipx_installed.stat.exists
+    mode: "0755"
+  when: not setup_pipx_installed.stat.exists
 
 - name: Make pipx available globally
   ansible.builtin.command:
     cmd: python3 pipx.pyz install pipx --global
     chdir: "/tmp"
     creates: "/usr/local/bin/pipx"
-  when: not pipx_installed.stat.exists
+  when: not setup_pipx_installed.stat.exists
 
 - name: Clean up pipx installer
   ansible.builtin.file:
     path: "/tmp/pipx.pyz"
     state: absent
-  when: not pipx_installed.stat.exists
+  when: not setup_pipx_installed.stat.exists

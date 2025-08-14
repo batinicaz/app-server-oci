@@ -13,7 +13,7 @@
 - name: Generate secret key
   ansible.builtin.command: openssl rand -hex 64
   changed_when: true
-  register: secret_key
+  register: planka_secret_key
 
 - name: Create compose file
   ansible.builtin.template:
@@ -23,7 +23,7 @@
     group: root
     mode: '0700'
   vars:
-    key: "{{ secret_key.stdout }}"
+    key: "{{ planka_secret_key.stdout }}"
 
 - name: Create Nginx config file
   ansible.builtin.template:

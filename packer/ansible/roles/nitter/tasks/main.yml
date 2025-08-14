@@ -25,7 +25,7 @@
     return_content: true
     headers:
       Accept: "application/vnd.github.v3+json"
-  register: latest_nitter_release
+  register: nitter_latest_release
 
 - name: Create nitter directory
   ansible.builtin.file:
@@ -38,7 +38,7 @@
 - name: Download and extract latest release
   ansible.builtin.unarchive:
     # Grab the ARM release if building locally
-    src: "{{ latest_nitter_release.json.assets[nitter_use_arm | ternary(1, 0)].browser_download_url }}"
+    src: "{{ nitter_latest_release.json.assets[nitter_use_arm | ternary(1, 0)].browser_download_url }}"
     dest: "{{ nitter_install_dir }}"
     remote_src: true
     creates: "{{ nitter_install_dir }}/nitter"
@@ -49,7 +49,7 @@
 - name: Generate a cryptographic salt for use in configuration
   ansible.builtin.command: openssl rand -base64 32
   changed_when: true
-  register: salt
+  register: nitter_salt
 
 - name: Set port number to use
   ansible.builtin.set_fact:

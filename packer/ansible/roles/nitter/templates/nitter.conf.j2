@@ -17,7 +17,7 @@ redisConnections = 20  # minimum open connections in pool
 redisMaxConnections = 30
 
 [Config]
-hmacKey = "{{ salt.stdout }}"
+hmacKey = "{{ nitter_salt.stdout }}"
 base64Media = false
 enableRSS = true
 enableDebug = false
