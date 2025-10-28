@@ -5,7 +5,7 @@
       - apparmor-utils
     state: present
 
-- name: "Put in place AppArmor profile for {{ item.name }}"
+- name: "Put in place AppArmor profiles"
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "/etc/apparmor.d/{{ item.dest }}"
