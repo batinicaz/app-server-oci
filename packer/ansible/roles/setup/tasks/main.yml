@@ -1,3 +1,12 @@
+- name: Stop automatic update services to prevent locks impacting build
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+  loop:
+    - unattended-upgrades
+    - apt-daily.service
+    - apt-daily-upgrade.service
+
 - name: Remove telemetry packages
   ansible.builtin.apt:
     name:
