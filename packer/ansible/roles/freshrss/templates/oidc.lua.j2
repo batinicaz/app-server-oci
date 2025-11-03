@@ -6,8 +6,16 @@
     scope = "openid email profile",
     iat_slack = 600
   }
-  
-  local res, err = require("resty.openidc").authenticate(opts)
+
+  local session_opts = {
+    secret = "{{ freshrss.sessionSecret }}",
+    cookie_prefix = "__Host-",
+    cookie_secure = true,
+    cookie_same_site = "Lax",
+    remember = true
+  }
+
+  local res, err = require("resty.openidc").authenticate(opts, nil, nil, session_opts)
   
   if err then
     ngx.status = 500

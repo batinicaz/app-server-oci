@@ -13,6 +13,10 @@
   ansible.builtin.apt:
     name: openresty
 
+- name: Install Lua package manager
+  ansible.builtin.apt:
+    name: luarocks
+
 - name: Create confd directory
   ansible.builtin.file:
     path: "{{ nginx_confd_directory }}"
@@ -66,15 +70,10 @@
     owner: "{{ nginx_user }}"
     group: "{{ nginx_group }}"
 
-- name: Install required version of session
-  ansible.builtin.command: opm get bungle/lua-resty-session
-  args:
-    creates: /usr/local/openresty/site/lualib/resty/session.lua
-
 - name: Install OIDC support
-  ansible.builtin.command: opm get zmartzone/lua-resty-openidc
+  ansible.builtin.command: luarocks install lua-resty-openidc
   args:
-    creates: /usr/local/openresty/site/lualib/resty/openidc.lua
+    creates: /usr/local/share/lua/5.1/resty/openidc.lua
 
 - name: Start and enable Openresty service
   ansible.builtin.systemd:
