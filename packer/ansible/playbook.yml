@@ -3,9 +3,23 @@
   become: true
   vars_files:
     - vault.yml
-  module_defaults:
-    ansible.builtin.apt:
-      lock_timeout: 900
+  pre_tasks:
+    - name: Stop automatic update services to prevent locks impacting build
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop:
+        - apt-daily.timer
+        - apt-daily-upgrade.timer
+        - apt-daily.service
+        - apt-daily-upgrade.service
+        - unattended-upgrades.service
+
+    - name: Wait for any existing apt processes to finish
+      ansible.builtin.command: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
+      changed_when: false
+      timeout: 900
   roles:
     - role: setup
     - role: security
