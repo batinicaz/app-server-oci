@@ -2,7 +2,7 @@ default_language_version:
   golang: "1.24.6"
 repos:
   - repo: https://github.com/ansible/ansible-lint
-    rev: v25.8.1
+    rev: v25.12.1
     hooks:
       - id: ansible-lint
         additional_dependencies:
@@ -17,6 +17,6 @@ repos:
       - id: terraform-validate
 
   - repo: https://github.com/bridgecrewio/checkov.git
-    rev: 3.2.461
+    rev: 3.2.495
     hooks:
       - id: checkov
