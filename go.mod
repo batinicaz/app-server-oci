@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/gruntwork-io/terratest v0.54.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/exp v0.0.0-20251209150349-8475f28825e9
+	golang.org/x/exp v0.0.0-20251219203646-944ab1f22d93
 )
 
 require (
