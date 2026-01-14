@@ -1,9 +1,9 @@
 module batinicaz/app-server-oci
 
-go 1.24.1
+go 1.25.0
 
 require (
-	github.com/gruntwork-io/terratest v0.54.0
+	github.com/gruntwork-io/terratest v0.55.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20260112195511-716be5621a96
 )
